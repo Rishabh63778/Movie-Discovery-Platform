@@ -1,0 +1,133 @@
+.Home{
+    min-height: 100vh;
+    background: #0f0f0f;
+    color: white;
+}
+
+.Hero{
+    height: 70vh;
+    background:
+    linear-gradient(to right,#000000dd,#00000066),
+    url("https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?q=80&w=1400&auto=format&fit=crop");
+
+    background-size: cover;
+    background-position: center;
+
+    display: flex;
+    align-items: center;
+
+    padding: 60px;
+}
+
+.Hero-Content{
+    max-width: 700px;
+}
+
+.Hero-Content h1{
+    font-size: 60px;
+    margin-bottom: 20px;
+    line-height: 1.1;
+}
+
+.Hero-Content p{
+    font-size: 18px;
+    color: #dddddd;
+    margin-bottom: 30px;
+}
+
+.Search-Bar{
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.Search-Bar input{
+    flex: 1;
+    min-width: 250px;
+
+    padding: 15px;
+    border: none;
+    outline: none;
+
+    border-radius: 10px;
+    font-size: 16px;
+}
+
+.Search-Bar button{
+    padding: 15px 25px;
+    border: none;
+    border-radius: 10px;
+
+    background: red;
+    color: white;
+
+    font-size: 16px;
+    font-weight: bold;
+
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.Search-Bar button:hover{
+    background: #cc0000;
+}
+
+.Movies-Section{
+    padding: 50px 60px;
+}
+
+.Movies-Section h2{
+    font-size: 32px;
+    margin-bottom: 30px;
+}
+
+.Movie-Grid{
+    display: grid;
+
+    grid-template-columns:
+    repeat(auto-fit,minmax(220px,220px));
+    justify-content: start;
+
+    gap: 25px;
+}
+
+.Movie-Card{
+    background: #1a1a1a;
+    border-radius: 14px;
+
+    overflow: hidden;
+
+    transition: 0.3s;
+    cursor: pointer;
+}
+
+.Movie-Card:hover{
+    transform: translateY(-5px);
+}
+
+.Movie-Card img{
+    width: 100%;
+    height: 320px;
+
+    object-fit: cover;
+}
+
+.Movie-Info{
+    padding: 15px;
+}
+
+.Movie-Info h3{
+    font-size: 20px;
+    margin-bottom: 10px;
+}
+
+.Movie-Info p{
+    color: #cccccc;
+    margin-bottom: 5px;
+}
+
+.Loading,
+.No-Movies{
+    font-size: 18px;
+    color: #bbbbbb;
+}

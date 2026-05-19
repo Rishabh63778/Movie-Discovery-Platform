@@ -1,0 +1,51 @@
+.Register {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(to right, #141e30, #243b55);
+}
+
+.Register-Box{
+    width: 350px;
+    padding:30px;
+    border-radius: 12px;
+    background: white;
+    display: flex;
+    flex-direction: column;
+    gap:15px;
+}
+
+.Register-Box h1{
+    text-align: center;
+}
+
+.Register-Box input{
+    padding:12px;
+    border: 1px solid grey;
+    border-radius: 8px;
+    outline:none;
+}
+
+.Register-Box button{
+    padding: 12px;
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
+    background: black;
+    color: white;
+    font-size: 16px;
+}
+
+.Register-Box p{
+    text-align:center;
+}
+
+.Register-Box a{
+    text-decoration:none;
+}
+
+.Error{
+    color:red;
+    text-align:center;
+}
