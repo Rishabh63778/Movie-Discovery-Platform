@@ -18,14 +18,27 @@ const uploadoncloudinary = async (localFilePath) => {
 
         if (!localFilePath) return null
 
-        const response = await cloudinaryv2.uploader.upload(
-            localFilePath,
-            {
-                resource_type: "auto"
-            }
-        )
+        const response = await new Promise((resolve, reject) => {
 
-        fs.unlinkSync(localFilePath)
+            cloudinaryv2.uploader.upload_large(
+                localFilePath,
+                {
+                    resource_type: "auto",
+                },
+                (error, result) => {
+
+                    if (error) {
+                        reject(error)
+                    } else {
+                        resolve(result)
+                    }
+                }
+            )
+        })
+
+        fs.unlink(localFilePath, (err) => {
+            if (err) console.log(err)
+        })
 
         return response
 
@@ -34,7 +47,10 @@ const uploadoncloudinary = async (localFilePath) => {
         console.log(error)
 
         if (fs.existsSync(localFilePath)) {
-            fs.unlinkSync(localFilePath)
+
+            fs.unlink(localFilePath, (err) => {
+                if (err) console.log(err)
+            })
         }
 
         return null

@@ -1,0 +1,119 @@
+.MovieDisplay{
+    min-height: 100vh;
+    background: #111;
+    color: white;
+    padding: 40px 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.MovieDisplay-Container{
+    width: 100%;
+    max-width: 1200px;
+    display: flex;
+    gap: 40px;
+    background: #1b1b1b;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 0 20px rgba(0,0,0,0.4);
+}
+
+.MovieDisplay-Poster{
+    flex: 1;
+}
+
+.MovieDisplay-Poster img{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.MovieDisplay-Info{
+    flex: 1;
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.MovieDisplay-Info h1{
+    font-size: 3rem;
+    margin-bottom: 20px;
+}
+
+.Description{
+    color: #cfcfcf;
+    line-height: 1.7;
+    margin-bottom: 30px;
+    font-size: 1rem;
+}
+
+.MovieDetails{
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 30px;
+}
+
+.MovieDetails p{
+    font-size: 1rem;
+}
+
+.MovieDetails span{
+    font-weight: bold;
+    color: #ff3c3c;
+}
+
+.MovieDisplay-Buttons{
+    display: flex;
+    gap: 15px;
+}
+
+.WatchButton,
+.BackButton{
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: 0.3s ease;
+}
+
+.WatchButton{
+    background: #ff3c3c;
+    color: white;
+}
+
+.WatchButton:hover{
+    background: #e12d2d;
+}
+
+.BackButton{
+    background: #333;
+    color: white;
+}
+
+.BackButton:hover{
+    background: #444;
+}
+
+@media(max-width: 900px){
+
+    .MovieDisplay-Container{
+        flex-direction: column;
+    }
+
+    .MovieDisplay-Poster{
+        height: 450px;
+    }
+
+    .MovieDisplay-Info{
+        padding: 25px;
+    }
+
+    .MovieDisplay-Info h1{
+        font-size: 2rem;
+    }
+}

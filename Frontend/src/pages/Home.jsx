@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react"
 import api from "../api/axios.js"
 import "../styles/Home.css"
+import { useNavigate } from "react-router-dom"
 
 function Home() {
+    const navigate = useNavigate()
 
     const [movies, setmovies] = useState([])
     const [actionmovies, setactionmovies] = useState([])
@@ -139,6 +141,7 @@ function Home() {
                                         <div
                                             className="Movie-Card"
                                             key={movie._id}
+                                            onClick={() => navigate(`/movie/${movie._id}`)}
                                         >
 
                                             <img
