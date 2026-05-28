@@ -88,7 +88,7 @@ function MovieDisplay() {
 
                         <button
                             className="WatchButton"
-                            onClick={() => navigate("/player", { state: movie })}
+                            onClick={() => navigate(`/watch/${movie._id}`)}
                         >
                             Watch Now
                         </button>

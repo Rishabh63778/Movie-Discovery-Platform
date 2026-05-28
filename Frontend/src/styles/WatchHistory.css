@@ -1,0 +1,52 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.WatchHistory{
+    min-height: 100vh;
+    background: #0f0f0f;
+    color: white;
+    padding: 40px;
+}
+
+.WatchHistory h1{
+    margin-bottom: 30px;
+}
+
+.History-Grid{
+    display: grid;
+
+    grid-template-columns:
+    repeat(auto-fit,minmax(220px,220px));
+
+    gap: 25px;
+}
+
+.History-Card{
+    background: #1a1a1a;
+
+    border-radius: 14px;
+
+    overflow: hidden;
+
+    transition: 0.3s;
+
+    cursor: pointer;
+}
+
+.History-Card:hover{
+    transform: translateY(-5px);
+}
+
+.History-Card img{
+    width: 100%;
+    height: 320px;
+
+    object-fit: cover;
+}
+
+.History-Card h3{
+    padding: 15px;
+}

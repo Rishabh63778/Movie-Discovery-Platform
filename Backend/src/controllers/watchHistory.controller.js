@@ -28,15 +28,16 @@ const givewatchHistory = asynchandler(async (req, res) => {
         {
             $unwind: "$movieDetails"
         },
-        {
-            $project: {
-                progress: 1,
-                watchedAt: 1,
-                "movieDetails.title": 1,
-                "movieDetails.poster": 1,
-                "movieDetails.genre": 1
-            }
-        }
+       {
+    $project: {
+        progress: 1,
+        watchedAt: 1,
+        "movieDetails._id": 1,
+        "movieDetails.title": 1,
+        "movieDetails.poster": 1,
+        "movieDetails.genre": 1
+    }
+}
 
     ])
 
@@ -153,4 +154,4 @@ const getContinueWatching = asynchandler(async (req, res) => {
     )
 })
 
-export { givewatchHistory, updateWatchHistory, deleteWatchHistory,getContinueWatching }
+export { givewatchHistory, updateWatchHistory, deleteWatchHistory, getContinueWatching }

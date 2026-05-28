@@ -91,6 +91,7 @@ function Home() {
                         content anytime.
                     </p>
 
+
                     <div className="Search-Bar">
 
                         <input
@@ -109,6 +110,9 @@ function Home() {
                     </div>
 
                 </div>
+                <button onClick={() => navigate("/watch-history")}>
+                    History
+                </button>
 
             </div>
 
