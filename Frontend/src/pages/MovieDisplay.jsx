@@ -21,7 +21,6 @@ function MovieDisplay() {
                 setloading(false)
             }
         }
-
         fetchmovie()
     }, [id])
 
@@ -85,13 +84,6 @@ function MovieDisplay() {
                     </div>
 
                     <div className="MovieDisplay-Buttons">
-
-                        <button
-                            className="WatchButton"
-                            onClick={() => navigate(`/watch/${movie._id}`)}
-                        >
-                            Watch Now
-                        </button>
 
                         <button
                             className="BackButton"

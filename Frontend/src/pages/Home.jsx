@@ -83,12 +83,13 @@ function Home() {
                 <div className="Hero-Content">
 
                     <h1>
-                        Unlimited Movies, TV Shows & More
+                        Discover Movies You'll Love
+
+
                     </h1>
 
                     <p>
-                        Watch anywhere. Stream your favorite
-                        content anytime.
+                        Browse, search and explore your favorite movies.
                     </p>
 
 
@@ -110,10 +111,7 @@ function Home() {
                     </div>
 
                 </div>
-                <button onClick={() => navigate("/watch-history")}>
-                    History
-                </button>
-
+                
             </div>
 
             <div className="Movies-Section">

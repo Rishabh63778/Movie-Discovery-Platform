@@ -1,7 +1,6 @@
 import express from "express"
 import cors from "cors"
 import userRouter from "./routes/user.routes.js"
-import watchHistoryRouter from "./routes/watchHistory.routes.js"
 import movieRouter from "./routes/movie.routes.js"
 import cookieparser from "cookie-parser"
 const app = express()
@@ -20,7 +19,6 @@ app.use(express.static("public"))
 app.use(cookieparser())
 
 app.use("/users",userRouter)
-app.use("/watch-history",watchHistoryRouter)
 app.use("/movies",movieRouter)
 
 export default app

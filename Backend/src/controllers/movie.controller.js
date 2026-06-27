@@ -94,15 +94,14 @@ const getallmovies = asynchandler(async (req, res) => {
         {
             $project: {
                 title: 1,
-                poster: 1,
                 rating: 1,
                 year: 1,
+                poster:1,
                 cast: 1,
                 rating: 1,
                 description: 1,
                 genre: 1,
                 type: 1,
-                video: 1
             }
         }
     ])
@@ -392,8 +391,7 @@ const uploadMovieVideo = asynchandler(async (req, res) => {
         throw new ApiError(400, "Video file missing")
     }
 
-    const uploadedVideo =
-        await uploadoncloudinary(videoLocalPath)
+    const uploadedVideo = await uploadoncloudinary(videoLocalPath)
 
     if (!uploadedVideo) {
         throw new ApiError(500, "Video upload failed")
