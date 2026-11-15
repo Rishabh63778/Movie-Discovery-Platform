@@ -9,14 +9,6 @@ const movieschema = new mongoose.Schema({
         lowercase: true
     },
 
-    video: {
-        url: String,
-        public_id: String,
-        duration: Number,
-        format: String,
-        bytes: Number
-    },
-
     poster: {
         url: {
             type: String,

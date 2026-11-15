@@ -295,10 +295,6 @@ const deletemovie = asynchandler(async (req, res) => {
         await cloudinary.uploader.destroy(Movie.poster.public_id)
     }
 
-    if (Movie.video?.public_id) {
-        await cloudinary.uploader.destroy(Movie.video.public_id)
-    }
-
     await movie.findByIdAndDelete(movieId)
 
     return res.status(200).json(
@@ -371,104 +367,9 @@ const searchmovie = asynchandler(async (req, res) => {
     res.status(200).json(new apiresponse(200, movies, "Movies found"))
 })
 
-const uploadMovieVideo = asynchandler(async (req, res) => {
 
-    const { movieId } = req.params
 
-    if (!mongoose.Types.ObjectId.isValid(movieId)) {
-        throw new ApiError(400, "Invalid movie id")
-    }
 
-    const Movie = await movie.findById(movieId)
-
-    if (!Movie) {
-        throw new ApiError(404, "Movie not found")
-    }
-
-    const videoLocalPath = req.file?.path
-
-    if (!videoLocalPath) {
-        throw new ApiError(400, "Video file missing")
-    }
-
-    const uploadedVideo = await uploadoncloudinary(videoLocalPath)
-
-    if (!uploadedVideo) {
-        throw new ApiError(500, "Video upload failed")
-    }
-
-    const updatedMovie = await movie.findByIdAndUpdate(
-        movieId,
-        {
-            $set: {
-                video: {
-                    url: uploadedVideo.secure_url,
-                    public_id: uploadedVideo.public_id,
-                    duration: uploadedVideo.duration,
-                    format: uploadedVideo.format,
-                    bytes: uploadedVideo.bytes
-                }
-            }
-        },
-        {
-            returnDocument: "after"
-        }
-    )
-
-    return res.status(200).json(
-        new apiresponse(
-            200,
-            updatedMovie,
-            "Video uploaded successfully"
-        )
-    )
-})
-
-const deleteMovieVideo = asynchandler(async (req, res) => {
-
-    const { movieId } = req.params
-
-    if (!mongoose.Types.ObjectId.isValid(movieId)) {
-        throw new ApiError(400, "Invalid movie Id")
-    }
-
-    const Movie = await movie.findById(movieId)
-
-    if (!Movie) {
-        throw new ApiError(404, "Movie not found")
-    }
-
-    if (!Movie.video?.public_id) {
-        throw new ApiError(400, "Movie video not found")
-    }
-
-    await cloudinary.uploader.destroy(
-        Movie.video.public_id,
-        {
-            resource_type: "video"
-        }
-    )
-
-    const updatedMovie = await movie.findByIdAndUpdate(
-        movieId,
-        {
-            $unset: {
-                video: 1
-            }
-        },
-        {
-            returnDocument: "after"
-        }
-    )
-
-    return res.status(200).json(
-        new apiresponse(
-            200,
-            updatedMovie,
-            "Video deleted successfully"
-        )
-    )
-})
 
 export {
     addmovie,
@@ -476,7 +377,5 @@ export {
     getmovie,
     updatemovie,
     deletemovie,
-    searchmovie,
-    uploadMovieVideo,
-    deleteMovieVideo
+    searchmovie
 }

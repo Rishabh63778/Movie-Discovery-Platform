@@ -211,6 +211,7 @@ function Home() {
                                         <div
                                             className="Movie-Card"
                                             key={movie._id}
+                                            onClick={() => navigate(`/movie/${movie._id}`)}
                                         >
 
                                             <img
