@@ -1,0 +1,137 @@
+.Favourites {
+    min-height: 100vh;
+    background: #0f0f0f;
+    color: white;
+    padding: 40px 60px 70px;
+}
+
+.Favourites-Header,
+.Favourites > .Movie-Grid,
+.Favourites > .Loading,
+.Favourites > .Error {
+    width: 100%;
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.Favourites-Header {
+    margin-bottom: 35px;
+}
+
+.Back-Link {
+    display: inline-block;
+    margin-bottom: 26px;
+
+    color: #cccccc;
+    text-decoration: none;
+    font-size: 15px;
+    transition: color 0.25s ease;
+}
+
+.Back-Link:hover {
+    color: #ff3c3c;
+}
+
+.Favourites-Header h1 {
+    font-size: 40px;
+    margin-bottom: 12px;
+}
+
+.Favourites-Header p {
+    color: #a9a9a9;
+    max-width: 680px;
+    line-height: 1.6;
+}
+
+.Favourites > .Loading,
+.Favourites > .Error {
+    display: block;
+    padding-top: 10px;
+}
+
+.Favourite-Item {
+    position: relative;
+}
+
+.Remove-Favourite {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 2;
+
+    padding: 7px 12px;
+
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+
+    background: rgba(0, 0, 0, 0.78);
+    color: #ffb3b3;
+
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.25s ease;
+}
+
+.Remove-Favourite:hover {
+    background: #b20710;
+    color: white;
+}
+
+.Remove-Favourite:disabled {
+    opacity: 0.7;
+    cursor: wait;
+}
+
+.Favourites-Empty {
+    max-width: 620px;
+
+    margin: 50px auto 0;
+    padding: 45px 35px;
+
+    background: #191919;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+
+    text-align: center;
+}
+
+.Favourites-Empty h2 {
+    font-size: 28px;
+    margin-bottom: 12px;
+}
+
+.Favourites-Empty p {
+    color: #bdbdbd;
+    line-height: 1.6;
+    margin-bottom: 24px;
+}
+
+.Favourites-Empty a {
+    display: inline-block;
+
+    padding: 12px 22px;
+
+    background: #e50914;
+    border-radius: 8px;
+
+    color: white;
+    text-decoration: none;
+    font-weight: 600;
+    transition: background 0.25s ease;
+}
+
+.Favourites-Empty a:hover {
+    background: #c40812;
+}
+
+@media (max-width: 900px) {
+    .Favourites {
+        padding: 30px 22px 55px;
+    }
+
+    .Favourites-Header h1 {
+        font-size: 32px;
+    }
+}

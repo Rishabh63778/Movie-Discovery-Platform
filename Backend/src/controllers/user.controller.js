@@ -198,7 +198,9 @@ const updateuserdetails = asynchandler(async (req, res) => {
         {
             $set: updated
         },
-        { new: true }
+        {
+            returnDocument: "after"
+        }
     ).select("-password")
 
     return res.status(200).json(new apiresponse(200, User, "Account details updated successfully"))

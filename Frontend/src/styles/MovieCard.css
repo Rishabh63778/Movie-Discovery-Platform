@@ -1,0 +1,102 @@
+.Movie-Grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+    gap: 24px;
+}
+
+.Movie-Card {
+    background: #1a1a1a;
+    border-radius: 14px;
+    overflow: hidden;
+
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+}
+
+.Movie-Card:hover,
+.Movie-Card:focus-visible {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.45);
+}
+
+.Movie-Card:focus-visible {
+    outline: 2px solid #ff3c3c;
+    outline-offset: 2px;
+}
+
+.Movie-Card-Poster,
+.Movie-Card-Fallback {
+    width: 100%;
+    aspect-ratio: 2 / 3;
+}
+
+.Movie-Card-Poster {
+    display: block;
+    object-fit: cover;
+}
+
+.Movie-Card-Fallback {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 20px;
+    text-align: center;
+
+    background: linear-gradient(135deg, #252525, #161616);
+    color: #dddddd;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.Movie-Info {
+    padding: 15px;
+}
+
+.Movie-Info h3 {
+    font-size: 17px;
+    line-height: 1.35;
+    margin-bottom: 9px;
+
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.Movie-Card-Meta {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+
+    color: #cccccc;
+    font-size: 14px;
+}
+
+.Dot {
+    color: #777777;
+}
+
+.Movie-Card-Genres {
+    margin-top: 8px;
+    color: #9d9d9d;
+    font-size: 13px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+@media (max-width: 600px) {
+    .Movie-Grid {
+        grid-template-columns: repeat(auto-fill, minmax(145px, 1fr));
+        gap: 16px;
+    }
+
+    .Movie-Info {
+        padding: 12px;
+    }
+
+    .Movie-Info h3 {
+        font-size: 15px;
+    }
+}

@@ -1,259 +1,288 @@
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
+import { Link, useNavigate } from "react-router-dom"
 import api from "../api/axios.js"
+import MovieCard from "../components/MovieCard.jsx"
 import "../styles/Home.css"
-import { useNavigate } from "react-router-dom"
+
+const HOME_SECTIONS = [
+    {
+        key: "trending",
+        title: "Trending Movies",
+        params: { category: "trending" }
+    },
+    {
+        key: "popular",
+        title: "Popular Movies",
+        params: { category: "popular" }
+    },
+    {
+        key: "top_rated",
+        title: "Top Rated Movies",
+        params: { category: "top_rated" }
+    },
+    {
+        key: "action",
+        title: "Action Movies",
+        params: { genre: "Action" }
+    }
+]
 
 function Home() {
     const navigate = useNavigate()
 
-    const [movies, setmovies] = useState([])
-    const [actionmovies, setactionmovies] = useState([])
+    const [rows, setRows] = useState({})
+    const [loading, setLoading] = useState(true)
+    const [error, setError] = useState("")
 
-    const [search, setsearch] = useState("")
-    const [loading, setloading] = useState(false)
+    const [searchInput, setSearchInput] = useState("")
+    const [searchQuery, setSearchQuery] = useState("")
+    const [searchResults, setSearchResults] = useState([])
+    const [searching, setSearching] = useState(false)
+    const [searchError, setSearchError] = useState("")
+    const searchRequestRef = useRef(0)
 
-    const fetchmovies = async () => {
+    useEffect(() => {
+        let cancelled = false
 
-        try {
+        const fetchhome = async () => {
+            setLoading(true)
+            setError("")
 
-            setloading(true)
-
-            const response = await api.get("/movies")
-
-            setmovies(response.data.data.docs)
-
-        } catch (error) {
-            console.log(error)
-        } finally {
-            setloading(false)
-        }
-    }
-
-    const fetchactionmovies = async () => {
-
-        try {
-
-            const response = await api.get(
-                "/movies?genre=action"
+            const responses = await Promise.allSettled(
+                HOME_SECTIONS.map((section) => (
+                    api.get("/movies", { params: section.params })
+                ))
             )
 
-            setactionmovies(response.data.data.docs)
+            if (cancelled) return
 
-        } catch (error) {
-            console.log(error)
+            const nextRows = {}
+            let successfulRequests = 0
+
+            responses.forEach((response, index) => {
+                if (response.status === "fulfilled") {
+                    successfulRequests += 1
+                    nextRows[HOME_SECTIONS[index].key] = response.value.data.data.results
+                }
+            })
+
+            setRows(nextRows)
+
+            if (successfulRequests === 0) {
+                setError("Unable to load movies right now. Please try again.")
+            }
+
+            setLoading(false)
         }
-    }
 
-    const handlesearch = async () => {
+        fetchhome()
 
-        if (!search.trim()) {
-            fetchmovies()
+        return () => {
+            cancelled = true
+        }
+    }, [])
+
+    const handlesearch = async (event) => {
+        event.preventDefault()
+
+        const query = searchInput.trim()
+
+        if (!query) {
+            clearsearch()
             return
         }
 
+        const requestId = searchRequestRef.current + 1
+        searchRequestRef.current = requestId
+
+        setSearching(true)
+        setSearchError("")
+
         try {
+            const response = await api.get("/movies/search", {
+                params: { query }
+            })
 
-            setloading(true)
+            if (requestId !== searchRequestRef.current) return
 
-            const response = await api.get(
-                `/movies/search?query=${search}`
+            setSearchResults(response.data.data.results)
+            setSearchQuery(query)
+        } catch (err) {
+            if (requestId !== searchRequestRef.current) return
+
+            setSearchResults([])
+            setSearchQuery(query)
+            setSearchError(
+                err.response?.data?.message || "Unable to search movies right now."
             )
-
-            setmovies(response.data.data.docs)
-
-        } catch (error) {
-            console.log(error)
         } finally {
-            setloading(false)
+            if (requestId === searchRequestRef.current) {
+                setSearching(false)
+            }
         }
     }
 
-    useEffect(() => {
+    const clearsearch = () => {
+        searchRequestRef.current += 1
+        setSearchInput("")
+        setSearchQuery("")
+        setSearchResults([])
+        setSearchError("")
+        setSearching(false)
+    }
 
-        fetchmovies()
-        fetchactionmovies()
+    const featured = rows.trending?.[0]
 
-    }, [])
+    const heroStyle = featured?.backdrop?.url
+        ? {
+            backgroundImage: `linear-gradient(to right, rgba(0, 0, 0, 0.92), rgba(0, 0, 0, 0.4)), url("${featured.backdrop.url}")`
+        }
+        : undefined
 
     return (
         <div className="Home">
 
-            <div className="Hero">
+            <header className="Top-Bar">
+                <Link to="/home" className="Brand">
+                    CineScope
+                </Link>
+
+                <nav className="Top-Bar-Links">
+                    <Link to="/favourites">Favourites</Link>
+                </nav>
+            </header>
+
+            <div className="Hero" style={heroStyle}>
 
                 <div className="Hero-Content">
 
                     <h1>
                         Discover Movies You'll Love
-
-
                     </h1>
 
                     <p>
                         Browse, search and explore your favorite movies.
                     </p>
 
-
-                    <div className="Search-Bar">
+                    <form className="Search-Bar" onSubmit={handlesearch}>
 
                         <input
                             type="text"
                             placeholder="Search movies..."
-                            value={search}
-                            onChange={(e) =>
-                                setsearch(e.target.value)
-                            }
+                            value={searchInput}
+                            onChange={(event) => setSearchInput(event.target.value)}
+                            aria-label="Search movies"
                         />
 
-                        <button onClick={handlesearch}>
+                        <button type="submit">
                             Search
                         </button>
 
-                    </div>
+                        {
+                            searchQuery && (
+                                <button
+                                    type="button"
+                                    className="Clear-Search"
+                                    onClick={clearsearch}
+                                >
+                                    Clear
+                                </button>
+                            )
+                        }
+
+                    </form>
+
+                    {
+                        featured && (
+                            <button
+                                type="button"
+                                className="Hero-Featured"
+                                onClick={() => navigate(`/movie/${featured.id}`)}
+                            >
+                                <span>Featured today</span>
+                                {featured.title}
+                                <span aria-hidden="true">→</span>
+                            </button>
+                        )
+                    }
 
                 </div>
-                
-            </div>
-
-            <div className="Movies-Section">
-
-                <h2>
-                    {
-                        search.trim()
-                            ? `Search Results for "${search}"`
-                            : "Trending Movies"
-                    }
-                </h2>
-
-                {
-                    loading ? (
-
-                        <p className="Loading">
-                            Loading movies...
-                        </p>
-
-                    ) : (
-
-                        <div className="Movie-Grid">
-
-                            {
-                                movies.length > 0 ? (
-
-                                    movies.map((movie) => (
-
-                                        <div
-                                            className="Movie-Card"
-                                            key={movie._id}
-                                            onClick={() => navigate(`/movie/${movie._id}`)}
-                                        >
-
-                                            <img
-                                                src={movie.poster?.url}
-                                                alt={movie.title}
-                                            />
-
-                                            <div className="Movie-Info">
-
-                                                <h3>
-                                                    {movie.title}
-                                                </h3>
-
-                                                <p>
-                                                    ⭐ {
-                                                        movie.rating || "N/A"
-                                                    }
-                                                </p>
-
-                                                <p>
-                                                    {movie.year}
-                                                </p>
-
-                                            </div>
-
-                                        </div>
-                                    ))
-
-                                ) : (
-
-                                    <p className="No-Movies">
-                                        {
-                                            search.trim()
-                                                ? `No movies found for "${search}"`
-                                                : "No movies available"
-                                        }
-                                    </p>
-
-                                )
-                            }
-
-                        </div>
-
-                    )
-                }
 
             </div>
 
             {
-                !search.trim() && (
-
-                    <div className="Movies-Section">
+                searchQuery ? (
+                    <section className="Movies-Section">
 
                         <h2>
-                            Action Movies
+                            Search Results for "{searchQuery}"
                         </h2>
 
-                        <div className="Movie-Grid">
-
-                            {
-                                actionmovies.length > 0 ? (
-
-                                    actionmovies.map((movie) => (
-
-                                        <div
-                                            className="Movie-Card"
-                                            key={movie._id}
-                                            onClick={() => navigate(`/movie/${movie._id}`)}
-                                        >
-
-                                            <img
-                                                src={movie.poster?.url}
-                                                alt={movie.title}
-                                            />
-
-                                            <div className="Movie-Info">
-
-                                                <h3>
-                                                    {movie.title}
-                                                </h3>
-
-                                                <p>
-                                                    ⭐ {
-                                                        movie.rating || "N/A"
-                                                    }
-                                                </p>
-
-                                                <p>
-                                                    {movie.year}
-                                                </p>
-
-                                            </div>
-
-                                        </div>
-                                    ))
-
-                                ) : (
-
-                                    <p className="No-Movies">
-                                        No Action Movies Found
+                        {
+                            searching ? (
+                                <p className="Loading">Searching movies...</p>
+                            ) : searchError ? (
+                                <p className="Error">{searchError}</p>
+                            ) : searchResults.length > 0 ? (
+                                <>
+                                    <p className="Results-Count">
+                                        Showing {searchResults.length} results
                                     </p>
 
+                                    <div className="Movie-Grid">
+                                        {
+                                            searchResults.map((movie) => (
+                                                <MovieCard key={movie.id} movie={movie} />
+                                            ))
+                                        }
+                                    </div>
+                                </>
+                            ) : (
+                                <p className="No-Movies">
+                                    No movies found for "{searchQuery}"
+                                </p>
+                            )
+                        }
+
+                    </section>
+                ) : loading ? (
+                    <section className="Movies-Section">
+                        <p className="Loading">Loading movies...</p>
+                    </section>
+                ) : error ? (
+                    <section className="Movies-Section">
+                        <p className="Error">{error}</p>
+                    </section>
+                ) : (
+                    HOME_SECTIONS.map((section) => (
+                        <section className="Movies-Section" key={section.key}>
+                            <h2>{section.title}</h2>
+
+                            {
+                                rows[section.key]?.length > 0 ? (
+                                    <div className="Movie-Grid">
+                                        {
+                                            rows[section.key].map((movie) => (
+                                                <MovieCard key={movie.id} movie={movie} />
+                                            ))
+                                        }
+                                    </div>
+                                ) : (
+                                    <p className="No-Movies">No movies available</p>
                                 )
                             }
-
-                        </div>
-
-                    </div>
+                        </section>
+                    ))
                 )
             }
+
+            <footer className="Tmdb-Attribution">
+                Movie data provided by{" "}
+                <a href="https://www.themoviedb.org" target="_blank" rel="noreferrer">
+                    TMDB
+                </a>
+                . This product uses the TMDB API but is not endorsed or certified by TMDB.
+            </footer>
 
         </div>
     )
