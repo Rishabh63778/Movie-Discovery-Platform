@@ -18,6 +18,17 @@ const errorHandler = (err, req, res, next) => {
         }))
     }
 
+    if (err.name === "MulterError") {
+        statusCode = err.code === "LIMIT_FILE_SIZE" ? 413 : 400
+        message = err.code === "LIMIT_FILE_SIZE"
+            ? "Profile picture must be 5 MB or smaller"
+            : "Invalid profile picture upload"
+        errors = [{
+            field: "avatar",
+            message
+        }]
+    }
+
     if (err.code === 11000) {
         statusCode = 409
         message = "A record with these details already exists"

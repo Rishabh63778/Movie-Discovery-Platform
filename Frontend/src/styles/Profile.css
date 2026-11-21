@@ -1,0 +1,317 @@
+.Profile-Page {
+    min-height: 100vh;
+
+    background:
+        radial-gradient(circle at 85% 0%, rgba(229, 9, 20, 0.16), transparent 34%),
+        radial-gradient(circle at 0% 90%, rgba(255, 60, 60, 0.06), transparent 30%),
+        #0f0f0f;
+
+    color: white;
+}
+
+.Profile-Main {
+    width: 100%;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 44px 24px 80px;
+}
+
+.Profile-Back {
+    display: inline-block;
+    margin-bottom: 24px;
+
+    color: #cccccc;
+    text-decoration: none;
+    font-size: 15px;
+    transition: color 0.25s ease;
+}
+
+.Profile-Back:hover {
+    color: #ff3c3c;
+}
+
+.Profile-Card {
+    overflow: hidden;
+
+    background: linear-gradient(160deg, rgba(33, 33, 33, 0.96), rgba(17, 17, 17, 0.98));
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
+
+    box-shadow: 0 30px 70px rgba(0, 0, 0, 0.45);
+}
+
+.Profile-Card-Hero {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+
+    padding: 44px;
+
+    background:
+        linear-gradient(120deg, rgba(229, 9, 20, 0.17), transparent 58%),
+        rgba(255, 255, 255, 0.015);
+
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.Profile-Avatar-Editor {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 0 0 auto;
+    gap: 12px;
+}
+
+.Profile-Avatar-Actions {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 7px;
+
+    max-width: 220px;
+}
+
+.Profile-Avatar-Button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+
+    padding: 9px 16px;
+
+    background: rgba(229, 9, 20, 0.14);
+    border: 1px solid rgba(229, 9, 20, 0.45);
+    border-radius: 999px;
+
+    color: #ffd7d7;
+    font: inherit;
+    font-size: 13px;
+    font-weight: 600;
+
+    cursor: pointer;
+    transition:
+        background 0.25s ease,
+        border-color 0.25s ease,
+        color 0.25s ease;
+}
+
+.Profile-Avatar-Button:hover:not(:disabled) {
+    background: rgba(229, 9, 20, 0.26);
+    border-color: rgba(255, 90, 90, 0.7);
+    color: #ffffff;
+}
+
+.Profile-Avatar-Button:focus-visible {
+    outline: 2px solid #ff5a5a;
+    outline-offset: 3px;
+}
+
+.Profile-Avatar-Button:disabled {
+    opacity: 0.65;
+    cursor: wait;
+}
+
+.Profile-Avatar-Button-Icon {
+    width: 16px;
+    height: 16px;
+}
+
+.Profile-Avatar-Input {
+    display: none;
+}
+
+.Profile-Avatar-Hint {
+    color: #8d8d8d;
+    font-size: 11.5px;
+    line-height: 1.4;
+    text-align: center;
+}
+
+.Profile-Avatar-Message {
+    font-size: 12.5px;
+    line-height: 1.5;
+    text-align: center;
+}
+
+.Profile-Avatar-Message--error {
+    color: #ff9b9b;
+}
+
+.Profile-Avatar-Message--success {
+    color: #8ee6a8;
+}
+
+.Profile-Identity {
+    min-width: 0;
+}
+
+.Profile-Eyebrow {
+    margin-bottom: 9px;
+
+    color: #ff8b8b;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1.4px;
+    text-transform: uppercase;
+}
+
+.Profile-Identity h1 {
+    margin-bottom: 8px;
+
+    font-size: 42px;
+    line-height: 1.1;
+    overflow-wrap: anywhere;
+}
+
+.Profile-Email {
+    color: #b9b9b9;
+    font-size: 16px;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+}
+
+.Profile-Details {
+    padding: 34px 44px 40px;
+}
+
+.Profile-Details h2 {
+    margin-bottom: 24px;
+
+    font-size: 24px;
+    line-height: 1.2;
+}
+
+.Profile-Details-Grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+}
+
+.Profile-Detail {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+
+    min-width: 0;
+    padding: 18px;
+
+    background: rgba(255, 255, 255, 0.025);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 13px;
+}
+
+.Profile-Detail-Icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+
+    width: 38px;
+    height: 38px;
+
+    background: rgba(229, 9, 20, 0.13);
+    border: 1px solid rgba(229, 9, 20, 0.24);
+    border-radius: 10px;
+
+    color: #ff7b7b;
+}
+
+.Profile-Detail-Icon svg {
+    width: 18px;
+    height: 18px;
+}
+
+.Profile-Detail > div {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    min-width: 0;
+}
+
+.Profile-Detail-Label {
+    color: #9f9f9f;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+}
+
+.Profile-Detail-Value {
+    color: #f1f1f1;
+    font-size: 15px;
+    line-height: 1.45;
+    overflow-wrap: anywhere;
+}
+
+.Profile-Note {
+    margin-top: 26px;
+    padding-top: 22px;
+
+    border-top: 1px solid rgba(255, 255, 255, 0.07);
+
+    color: #858585;
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+@media (max-width: 800px) {
+    .Profile-Card-Hero {
+        padding: 30px 24px;
+    }
+
+    .Profile-Identity h1 {
+        font-size: 34px;
+    }
+
+    .Profile-Details {
+        padding: 28px 24px 32px;
+    }
+
+    .Profile-Details-Grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 600px) {
+    .Profile-Main {
+        padding: 28px 16px 60px;
+    }
+
+    .Profile-Card {
+        border-radius: 16px;
+    }
+
+    .Profile-Card-Hero {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 22px;
+
+        padding: 28px 20px;
+    }
+
+    .Profile-Avatar-Editor,
+    .Profile-Avatar-Actions {
+        align-items: flex-start;
+    }
+
+    .Profile-Avatar-Hint,
+    .Profile-Avatar-Message {
+        text-align: left;
+    }
+
+    .Profile-Identity h1 {
+        font-size: 29px;
+    }
+
+    .Profile-Details {
+        padding: 24px 20px 28px;
+    }
+
+    .Profile-Details h2 {
+        font-size: 21px;
+    }
+
+    .Profile-Detail {
+        padding: 15px;
+    }
+}

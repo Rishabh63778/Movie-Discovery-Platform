@@ -1,0 +1,50 @@
+.Route-Loading {
+    min-height: 100vh;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 24px;
+
+    background: #0f0f0f;
+    color: #d7d7d7;
+
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 17px;
+    letter-spacing: 0.2px;
+}
+
+body {
+    min-height: 100vh;
+    background: #0f0f0f;
+}
+
+.Skeleton-Block {
+    background:
+        linear-gradient(
+            90deg,
+            rgba(255, 255, 255, 0.055) 25%,
+            rgba(255, 255, 255, 0.12) 37%,
+            rgba(255, 255, 255, 0.055) 63%
+        );
+
+    background-size: 400% 100%;
+    animation: skeletonShimmer 1.4s ease infinite;
+}
+
+@keyframes skeletonShimmer {
+    0% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0 50%;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .Skeleton-Block {
+        animation: none;
+    }
+}

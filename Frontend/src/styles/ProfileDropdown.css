@@ -1,0 +1,197 @@
+.Profile-Dropdown {
+    position: relative;
+}
+
+.Profile-Trigger {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    padding: 4px 9px 4px 4px;
+
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.13);
+    border-radius: 999px;
+
+    color: white;
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.Profile-Trigger:hover,
+.Profile-Trigger.Open {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 60, 60, 0.55);
+    box-shadow: 0 0 0 3px rgba(229, 9, 20, 0.12);
+}
+
+.Profile-Trigger:focus-visible {
+    outline: 2px solid #ff3c3c;
+    outline-offset: 3px;
+}
+
+.Profile-Chevron {
+    width: 14px;
+    height: 14px;
+
+    color: #bdbdbd;
+
+    transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.Profile-Trigger.Open .Profile-Chevron {
+    color: #ffffff;
+    transform: rotate(180deg);
+}
+
+.Profile-Menu {
+    position: absolute;
+    top: calc(100% + 12px);
+    right: 0;
+    z-index: 60;
+
+    width: min(320px, calc(100vw - 32px));
+    padding: 10px;
+
+    background: #181818;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 14px;
+
+    box-shadow:
+        0 24px 55px rgba(0, 0, 0, 0.55),
+        0 0 0 1px rgba(0, 0, 0, 0.25);
+
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+
+    transform: translateY(-8px) scale(0.98);
+    transform-origin: top right;
+
+    transition:
+        opacity 0.18s ease,
+        transform 0.18s ease,
+        visibility 0.18s ease;
+}
+
+.Profile-Menu.Open {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: translateY(0) scale(1);
+}
+
+.Profile-Menu-Header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    padding: 8px 8px 14px;
+}
+
+.Profile-Menu-Identity {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
+}
+
+.Profile-Menu-Identity strong {
+    color: white;
+    font-size: 15px;
+    line-height: 1.3;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.Profile-Menu-Identity span {
+    color: #a9a9a9;
+    font-size: 13px;
+    line-height: 1.35;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.Profile-Menu-Divider {
+    height: 1px;
+    margin: 0 4px 8px;
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.Profile-Menu-Item {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+
+    width: 100%;
+    padding: 11px 12px;
+
+    background: transparent;
+    border: none;
+    border-radius: 9px;
+
+    color: #e4e4e4;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    font-family: inherit;
+    text-align: left;
+
+    cursor: pointer;
+    transition: background 0.18s ease, color 0.18s ease;
+}
+
+.Profile-Menu-Item:hover,
+.Profile-Menu-Item:focus-visible {
+    background: rgba(255, 255, 255, 0.08);
+    color: white;
+    outline: none;
+}
+
+.Profile-Menu-Icon {
+    width: 18px;
+    height: 18px;
+    flex: 0 0 auto;
+    color: #bdbdbd;
+}
+
+.Profile-Menu-Item:hover .Profile-Menu-Icon,
+.Profile-Menu-Item:focus-visible .Profile-Menu-Icon {
+    color: #ff6b6b;
+}
+
+.Profile-Menu-Logout {
+    color: #ffb3b3;
+}
+
+.Profile-Menu-Logout .Profile-Menu-Icon {
+    color: #ff8d8d;
+}
+
+.Profile-Menu-Logout:hover,
+.Profile-Menu-Logout:focus-visible {
+    background: rgba(229, 9, 20, 0.14);
+    color: #ffd5d5;
+}
+
+.Profile-Menu-Logout:hover .Profile-Menu-Icon,
+.Profile-Menu-Logout:focus-visible .Profile-Menu-Icon {
+    color: #ff6b6b;
+}
+
+.Profile-Menu-Logout:disabled {
+    opacity: 0.65;
+    cursor: wait;
+}
+
+@media (max-width: 600px) {
+    .Profile-Menu {
+        width: min(300px, calc(100vw - 24px));
+    }
+}

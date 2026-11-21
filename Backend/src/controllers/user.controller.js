@@ -2,6 +2,7 @@ import asynchandler from "../utils/asynchandler.js"
 import { user } from "../models/user.models.js"
 import ApiError from "../utils/apierror.js"
 import apiresponse from "../utils/apiresponse.js"
+import { uploadAvatar } from "../services/cloudinary.service.js"
 import jwt from "jsonwebtoken"
 
 const generatetokens = async (id) => {
@@ -21,9 +22,12 @@ const generatetokens = async (id) => {
 }
 
 const registeruser = asynchandler(async (req, res) => {
-    const { email, password, username } = req.body
-    if ([email, password, username].some((field) => field?.trim() === "")) {
-        throw new ApiError(400, "All fields are required")
+    const { fullName, email, password, username } = req.body
+
+    if ([fullName, email, password, username].some(
+        (field) => typeof field !== "string" || !field.trim()
+    )) {
+        throw new ApiError(400, "Full name, username, email and password are required")
     }
 
     const userexists = await user.findOne({
@@ -35,6 +39,7 @@ const registeruser = asynchandler(async (req, res) => {
     }
 
     const User = await user.create({
+        fullName: fullName.trim(),
         username,
         email,
         password
@@ -177,19 +182,62 @@ const changepassword = asynchandler(async (req, res) => {
     return res.status(200).json(new apiresponse(200, {}, "password changed successfully"))
 })
 
+const getSafeUser = (User) => ({
+    _id: User._id,
+    fullName: User.fullName || User.username,
+    username: User.username,
+    email: User.email,
+    avatar: User.avatar || "",
+    createdAt: User.createdAt,
+    updatedAt: User.updatedAt
+})
+
 const getcurrentuser = asynchandler(async (req, res) => {
-    return res.status(200).json(new apiresponse(200, req.user, "Current user fetched successfully"))
+    return res.status(200).json(
+        new apiresponse(200, getSafeUser(req.user), "Current user fetched successfully")
+    )
+})
+
+const updateavatar = asynchandler(async (req, res) => {
+    if (!req.file) {
+        throw new ApiError(400, "Profile picture is required")
+    }
+
+    const { url, publicId } = await uploadAvatar(req.file, req.user._id)
+
+    const User = await user.findByIdAndUpdate(
+        req.user._id,
+        {
+            $set: {
+                avatar: url,
+                avatarPublicId: publicId
+            }
+        },
+        {
+            returnDocument: "after",
+            runValidators: true
+        }
+    ).select("-password -RefreshToken")
+
+    if (!User) {
+        throw new ApiError(404, "User not found")
+    }
+
+    return res.status(200).json(
+        new apiresponse(200, getSafeUser(User), "Profile picture updated successfully")
+    )
 })
 
 const updateuserdetails = asynchandler(async (req, res) => {
-    const { username, email } = req.body
+    const { fullName, username, email } = req.body
 
-    if (!username && !email) {
+    if (!fullName && !username && !email) {
         throw new ApiError(400, "Enter details to change")
     }
 
     const updated = {}
 
+    if (fullName) updated.fullName = fullName
     if (username) updated.username = username
     if (email) updated.email = email
 
@@ -201,11 +249,11 @@ const updateuserdetails = asynchandler(async (req, res) => {
         {
             returnDocument: "after"
         }
-    ).select("-password")
+    ).select("-password -RefreshToken")
 
     return res.status(200).json(new apiresponse(200, User, "Account details updated successfully"))
 
 })
 
 
-export { registeruser, loginuser, logoutuser, refreshAccessToken, changepassword, getcurrentuser, updateuserdetails }
+export { registeruser, loginuser, logoutuser, refreshAccessToken, changepassword, getcurrentuser, updateuserdetails, updateavatar }

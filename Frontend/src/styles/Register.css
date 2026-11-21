@@ -1,51 +1,199 @@
 .Register {
-    height: 100vh;
+    min-height: 100vh;
+
     display: flex;
-    justify-content: center;
     align-items: center;
-    background: linear-gradient(to right, #141e30, #243b55);
+    justify-content: center;
+
+    padding: 42px 18px;
+
+    background:
+        linear-gradient(
+            115deg,
+            rgba(4, 4, 4, 0.95) 0%,
+            rgba(8, 8, 8, 0.74) 55%,
+            rgba(4, 4, 4, 0.95) 100%
+        ),
+        url("https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?q=80&w=1974&auto=format&fit=crop");
+
+    background-size: cover;
+    background-position: center;
+
+    color: white;
+    font-family: Arial, Helvetica, sans-serif;
 }
 
-.Register-Box{
-    width: 350px;
-    padding:30px;
-    border-radius: 12px;
-    background: white;
+.Register *,
+.Register *::before,
+.Register *::after {
+    box-sizing: border-box;
+}
+
+.Register-Box {
+    width: 100%;
+    max-width: 480px;
+
+    padding: 38px;
+
+    background: rgba(16, 16, 16, 0.94);
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    border-radius: 18px;
+
+    box-shadow: 0 28px 70px rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(14px);
+}
+
+.Register-Brand {
+    display: inline-block;
+    margin-bottom: 24px;
+
+    color: white;
+    text-decoration: none;
+
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: 0.3px;
+}
+
+.Register-Brand span {
+    color: #e50914;
+}
+
+.Register-Header {
+    margin-bottom: 22px;
+}
+
+.Register-Header h1 {
+    margin-bottom: 8px;
+
+    font-size: 30px;
+    line-height: 1.15;
+    font-weight: 700;
+}
+
+.Register-Header p {
+    color: #a9a9a9;
+    font-size: 14px;
+    line-height: 1.55;
+}
+
+.Register-Error {
+    margin-bottom: 18px;
+    padding: 11px 13px;
+
+    background: rgba(229, 9, 20, 0.13);
+    border: 1px solid rgba(229, 9, 20, 0.32);
+    border-radius: 9px;
+
+    color: #ff9f9f;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.Register-Form {
     display: flex;
     flex-direction: column;
-    gap:15px;
+    gap: 16px;
 }
 
-.Register-Box h1{
+.Register-Field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    color: #d2d2d2;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.2px;
+}
+
+.Register-Field input {
+    width: 100%;
+    padding: 13px 14px;
+
+    background: rgba(255, 255, 255, 0.045);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 10px;
+
+    color: white;
+    font-family: inherit;
+    font-size: 15px;
+
+    outline: none;
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.Register-Field input::placeholder {
+    color: #757575;
+}
+
+.Register-Field input:focus {
+    background: rgba(255, 255, 255, 0.065);
+    border-color: rgba(255, 60, 60, 0.65);
+    box-shadow: 0 0 0 3px rgba(229, 9, 20, 0.13);
+}
+
+.Register-Submit {
+    width: 100%;
+    margin-top: 4px;
+    padding: 13px 16px;
+
+    background: #e50914;
+    border: none;
+    border-radius: 10px;
+
+    color: white;
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 700;
+
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.Register-Submit:hover:not(:disabled) {
+    background: #c40812;
+    transform: translateY(-1px);
+}
+
+.Register-Submit:disabled {
+    opacity: 0.65;
+    cursor: wait;
+}
+
+.Register-Redirect {
+    margin-top: 22px;
+
+    color: #9f9f9f;
+    font-size: 14px;
     text-align: center;
 }
 
-.Register-Box input{
-    padding:12px;
-    border: 1px solid grey;
-    border-radius: 8px;
-    outline:none;
+.Register-Redirect a {
+    color: #ff6b6b;
+    text-decoration: none;
+    font-weight: 600;
 }
 
-.Register-Box button{
-    padding: 12px;
-    border:none;
-    border-radius:8px;
-    cursor:pointer;
-    background: black;
-    color: white;
-    font-size: 16px;
+.Register-Redirect a:hover {
+    color: #ff9f9f;
+    text-decoration: underline;
 }
 
-.Register-Box p{
-    text-align:center;
-}
+@media (max-width: 480px) {
+    .Register {
+        padding: 22px 12px;
+    }
 
-.Register-Box a{
-    text-decoration:none;
-}
+    .Register-Box {
+        padding: 28px 22px;
+        border-radius: 15px;
+    }
 
-.Error{
-    color:red;
-    text-align:center;
+    .Register-Header h1 {
+        font-size: 26px;
+    }
 }

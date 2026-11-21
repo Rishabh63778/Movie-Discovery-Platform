@@ -2,7 +2,10 @@ import express from "express"
 import cors from "cors"
 import cookieparser from "cookie-parser"
 import userRouter from "./routes/user.routes.js"
+import authRouter from "./routes/auth.routes.js"
 import movieRouter from "./routes/movie.routes.js"
+import personRouter from "./routes/person.routes.js"
+import searchRouter from "./routes/search.routes.js"
 import favouriteRouter from "./routes/favourite.routes.js"
 import watchHistoryRouter from "./routes/watchHistory.routes.js"
 import { errorHandler, notFound } from "./middleware/error.middleware.js"
@@ -22,7 +25,10 @@ app.get("/", (req, res) => {
 })
 
 app.use("/users", userRouter)
+app.use("/api/auth", authRouter)
 app.use("/movies", movieRouter)
+app.use("/people", personRouter)
+app.use("/search", searchRouter)
 app.use("/favourites", favouriteRouter)
 app.use("/watch-history", watchHistoryRouter)
 

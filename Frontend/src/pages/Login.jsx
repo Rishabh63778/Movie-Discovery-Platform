@@ -1,22 +1,26 @@
 import "../styles/Login.css"
 import { useState } from "react"
-import api from "../api/axios.js"
-import { Link,useNavigate } from "react-router-dom"
+import { Link, useLocation, useNavigate } from "react-router-dom"
+import { useAuth } from "../context/useAuth.js"
 
 function Login() {
-    const [formData, setformData] = useState({
-        username: "",
-        email: "",
+    const [formData, setFormData] = useState({
+        identifier: "",
         password: ""
     })
 
+    const [showPassword, setShowPassword] = useState(false)
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState("")
 
+    const { login } = useAuth()
     const navigate = useNavigate()
+    const location = useLocation()
+
+    const successMessage = location.state?.message
 
     const handleChange = (e) => {
-        setformData({
+        setFormData({
             ...formData, [e.target.name]: e.target.value
         })
     }
@@ -24,18 +28,26 @@ function Login() {
     const handleSubmit = async (e) => {
         e.preventDefault()
         setError("")
+
+        const identifier = formData.identifier.trim()
+
+        if (!identifier || !formData.password) {
+            setError("Enter your username or email and password.")
+            return
+        }
+
         try {
             setLoading(true)
-            const response = await api.post("/users/login", {
-                username: formData.username,
-                email: formData.email,
-                password: formData.password
-            })
-            console.log(response.data)
-            navigate("/home")
+
+            const credentials = identifier.includes("@")
+                ? { email: identifier, password: formData.password }
+                : { username: identifier, password: formData.password }
+
+            await login(credentials)
+            navigate(location.state?.from || "/home", { replace: true })
         }
         catch (error) {
-            setError(error.response?.data?.message || "Login Failed")
+            setError(error.response?.data?.message || "Login failed. Please try again.")
         }
         finally {
             setLoading(false)
@@ -44,27 +56,86 @@ function Login() {
 
     return (
         <div className="Login">
-            <form className="Login-Box" onSubmit={handleSubmit}>
-                <h1>Login</h1>
+            <div className="Login-Box">
+                <Link to="/" className="Login-Brand">
+                    CineScope<span>.</span>
+                </Link>
+
+                <div className="Login-Header">
+                    <h1>Welcome back</h1>
+                    <p>Sign in to continue your movie journey.</p>
+                </div>
+
                 {
-                    error && <p className="Error">{error}</p>
+                    successMessage && (
+                        <p className="Login-Success" role="status">
+                            {successMessage}
+                        </p>
+                    )
                 }
-                <input type="text" name="username" placeholder="Enter Username" value={formData.username} onChange={handleChange}/>
-                <p className="Or">OR</p>
-                <input type="email" name="email" placeholder="Enter Email" value={formData.email} onChange={handleChange}/>
-                <input type="password" name="password" placeholder="Enter password" value={formData.password} onChange={handleChange} required/>
-                <button type="submit">
-                    {
-                        loading ? "Logging in...":"Login"
-                    }
-                </button>
-                <p className="Redirect">
-                    Don't have an account? <Link to="/register">Register</Link>
+
+                {
+                    error && (
+                        <p className="Login-Error" role="alert">
+                            {error}
+                        </p>
+                    )
+                }
+
+                <form className="Login-Form" onSubmit={handleSubmit}>
+                    <label className="Login-Field">
+                        <span>Username or email</span>
+                        <input
+                            type="text"
+                            name="identifier"
+                            placeholder="Enter your username or email"
+                            value={formData.identifier}
+                            onChange={handleChange}
+                            autoComplete="username"
+                            required
+                        />
+                    </label>
+
+                    <label className="Login-Field">
+                        <span>Password</span>
+
+                        <div className="Login-Password">
+                            <input
+                                type={showPassword ? "text" : "password"}
+                                name="password"
+                                placeholder="Enter your password"
+                                value={formData.password}
+                                onChange={handleChange}
+                                autoComplete="current-password"
+                                required
+                            />
+
+                            <button
+                                type="button"
+                                className="Login-Password-Toggle"
+                                onClick={() => setShowPassword((current) => !current)}
+                                aria-label={showPassword ? "Hide password" : "Show password"}
+                            >
+                                {showPassword ? "Hide" : "Show"}
+                            </button>
+                        </div>
+                    </label>
+
+                    <button
+                        type="submit"
+                        className="Login-Submit"
+                        disabled={loading}
+                    >
+                        {loading ? "Signing in..." : "Sign in"}
+                    </button>
+                </form>
+
+                <p className="Login-Redirect">
+                    New to CineScope? <Link to="/register">Create an account</Link>
                 </p>
-            </form>
+            </div>
         </div>
     )
-
 }
 
 export default Login

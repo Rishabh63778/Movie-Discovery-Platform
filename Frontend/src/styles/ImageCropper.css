@@ -1,0 +1,439 @@
+.Cropper-Overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 24px;
+
+    background: rgba(5, 5, 5, 0.82);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+
+    animation: Cropper-Fade-In 0.2s ease;
+}
+
+.Cropper-Dialog {
+    width: 100%;
+    max-width: 470px;
+    max-height: calc(100vh - 48px);
+    overflow-y: auto;
+
+    padding: 26px;
+
+    background: linear-gradient(160deg, #232323, #141414);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6);
+
+    color: #ffffff;
+    outline: none;
+
+    animation: Cropper-Pop-In 0.22s ease;
+}
+
+.Cropper-Header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+
+    margin-bottom: 18px;
+}
+
+.Cropper-Header h2 {
+    margin-bottom: 6px;
+
+    font-size: 21px;
+    line-height: 1.25;
+}
+
+.Cropper-Header p {
+    color: #a8a8a8;
+    font-size: 13px;
+    line-height: 1.55;
+}
+
+.Cropper-Close {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+
+    width: 32px;
+    height: 32px;
+
+    padding: 0;
+
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+
+    color: #cfcfcf;
+    font-size: 22px;
+    line-height: 1;
+
+    cursor: pointer;
+    transition:
+        background 0.2s ease,
+        color 0.2s ease;
+}
+
+.Cropper-Close:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.14);
+    color: #ffffff;
+}
+
+.Cropper-Close:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.Cropper-Stage {
+    padding: 10px;
+
+    background: rgba(0, 0, 0, 0.35);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 16px;
+}
+
+.Cropper-Viewport {
+    position: relative;
+
+    width: 100%;
+    aspect-ratio: 1;
+
+    overflow: hidden;
+
+    background: #080808;
+    border-radius: 10px;
+
+    cursor: grab;
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+
+    outline: none;
+}
+
+.Cropper-Viewport:active {
+    cursor: grabbing;
+}
+
+.Cropper-Viewport:focus-visible {
+    box-shadow: inset 0 0 0 2px rgba(255, 90, 90, 0.9);
+}
+
+.Cropper-Image {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+
+    max-width: none;
+
+    pointer-events: none;
+    user-select: none;
+    -webkit-user-drag: none;
+}
+
+.Cropper-Mask {
+    position: absolute;
+    inset: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    pointer-events: none;
+}
+
+.Cropper-Circle {
+    width: 100%;
+    height: 100%;
+
+    border: 2px solid rgba(255, 255, 255, 0.85);
+    border-radius: 50%;
+
+    box-shadow:
+        0 0 0 9999px rgba(0, 0, 0, 0.62),
+        inset 0 0 0 1px rgba(0, 0, 0, 0.25);
+}
+
+.Cropper-Loading {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+
+    transform: translate(-50%, -50%);
+
+    color: #9b9b9b;
+    font-size: 13.5px;
+    white-space: nowrap;
+}
+
+.Cropper-Controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    margin-top: 16px;
+}
+
+.Cropper-Zoom-Button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+
+    width: 34px;
+    height: 34px;
+
+    padding: 0;
+
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 50%;
+
+    color: #e6e6e6;
+    font: inherit;
+    font-size: 18px;
+    line-height: 1;
+
+    cursor: pointer;
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease;
+}
+
+.Cropper-Zoom-Button:hover:not(:disabled) {
+    background: rgba(229, 9, 20, 0.2);
+    border-color: rgba(229, 9, 20, 0.5);
+}
+
+.Cropper-Zoom-Button:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.Cropper-Zoom-Range {
+    flex: 1;
+    min-width: 0;
+    height: 4px;
+
+    margin: 0;
+
+    background: rgba(255, 255, 255, 0.18);
+    border-radius: 999px;
+
+    appearance: none;
+    -webkit-appearance: none;
+
+    cursor: pointer;
+}
+
+.Cropper-Zoom-Range:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.Cropper-Zoom-Range::-webkit-slider-thumb {
+    width: 16px;
+    height: 16px;
+
+    background: #e50914;
+    border: 2px solid #ff8b8b;
+    border-radius: 50%;
+
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.45);
+
+    appearance: none;
+    -webkit-appearance: none;
+
+    cursor: grab;
+}
+
+.Cropper-Zoom-Range::-moz-range-thumb {
+    width: 14px;
+    height: 14px;
+
+    background: #e50914;
+    border: 2px solid #ff8b8b;
+    border-radius: 50%;
+
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.45);
+
+    cursor: grab;
+}
+
+.Cropper-Zoom-Range:focus-visible {
+    outline: 2px solid #ff5a5a;
+    outline-offset: 4px;
+}
+
+.Cropper-Reset {
+    flex: 0 0 auto;
+
+    padding: 7px 12px;
+
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 999px;
+
+    color: #bdbdbd;
+    font: inherit;
+    font-size: 12px;
+    font-weight: 600;
+
+    cursor: pointer;
+    transition:
+        border-color 0.2s ease,
+        color 0.2s ease;
+}
+
+.Cropper-Reset:hover:not(:disabled) {
+    border-color: rgba(255, 255, 255, 0.3);
+    color: #ffffff;
+}
+
+.Cropper-Reset:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.Cropper-Error {
+    margin-top: 14px;
+
+    color: #ff9b9b;
+    font-size: 12.5px;
+    line-height: 1.5;
+    text-align: center;
+}
+
+.Cropper-Footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+
+    margin-top: 22px;
+    padding-top: 18px;
+
+    border-top: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.Cropper-Button {
+    padding: 10px 20px;
+
+    border-radius: 999px;
+
+    font: inherit;
+    font-size: 13.5px;
+    font-weight: 700;
+
+    cursor: pointer;
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease,
+        color 0.2s ease,
+        opacity 0.2s ease;
+}
+
+.Cropper-Button:disabled {
+    opacity: 0.6;
+    cursor: wait;
+}
+
+.Cropper-Button--ghost {
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+
+    color: #cfcfcf;
+}
+
+.Cropper-Button--ghost:hover:not(:disabled) {
+    border-color: rgba(255, 255, 255, 0.32);
+    color: #ffffff;
+}
+
+.Cropper-Button--primary {
+    background: linear-gradient(135deg, #e50914, #b30710);
+    border: 1px solid rgba(255, 120, 120, 0.45);
+
+    color: #ffffff;
+
+    box-shadow: 0 8px 22px rgba(229, 9, 20, 0.28);
+}
+
+.Cropper-Button--primary:hover:not(:disabled) {
+    background: linear-gradient(135deg, #ff1a25, #c90812);
+}
+
+.Cropper-Button:focus-visible,
+.Cropper-Zoom-Button:focus-visible,
+.Cropper-Close:focus-visible,
+.Cropper-Reset:focus-visible {
+    outline: 2px solid #ff5a5a;
+    outline-offset: 3px;
+}
+
+@keyframes Cropper-Fade-In {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes Cropper-Pop-In {
+    from {
+        opacity: 0;
+        transform: translateY(10px) scale(0.98);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@media (max-width: 560px) {
+    .Cropper-Overlay {
+        padding: 12px;
+    }
+
+    .Cropper-Dialog {
+        max-height: calc(100vh - 24px);
+
+        padding: 20px 16px;
+
+        border-radius: 16px;
+    }
+
+    .Cropper-Header h2 {
+        font-size: 18px;
+    }
+
+    .Cropper-Stage {
+        padding: 7px;
+    }
+
+    .Cropper-Footer {
+        flex-direction: column-reverse;
+    }
+
+    .Cropper-Button {
+        width: 100%;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .Cropper-Overlay,
+    .Cropper-Dialog {
+        animation: none;
+    }
+}

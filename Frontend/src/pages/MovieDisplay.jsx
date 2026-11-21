@@ -2,17 +2,8 @@ import { useEffect, useMemo, useState } from "react"
 import { useNavigate, useParams } from "react-router-dom"
 import api from "../api/axios.js"
 import MovieCard from "../components/MovieCard.jsx"
+import getInitials from "../utils/initials.js"
 import "../styles/MovieDisplay.css"
-
-const getInitials = (name = "") => {
-    return name
-        .split(" ")
-        .filter(Boolean)
-        .slice(0, 2)
-        .map((part) => part[0])
-        .join("")
-        .toUpperCase()
-}
 
 function MovieDisplay() {
     const { id } = useParams()
@@ -132,6 +123,19 @@ function MovieDisplay() {
         }
     }
 
+    const openPerson = (personId) => {
+        if (!personId) return
+
+        navigate(`/person/${personId}`)
+    }
+
+    const handlePersonKeyDown = (event, personId) => {
+        if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault()
+            openPerson(personId)
+        }
+    }
+
     if (loading) {
         return (
             <div className="MovieDisplay">
@@ -164,6 +168,16 @@ function MovieDisplay() {
             backgroundImage: `linear-gradient(to bottom, rgba(0, 0, 0, 0.45), #111 92%), url("${movie.backdrop.url}")`
         }
         : undefined
+
+    const directors = movie.crew?.directorsDetailed?.length > 0
+        ? movie.crew.directorsDetailed
+        : (movie.crew?.directors || []).map((name) => ({
+            id: null,
+            name,
+            profile: null
+        }))
+
+    const keyCrew = movie.crew?.keyCrew || []
 
     return (
         <div className="MovieDisplay">
@@ -249,22 +263,6 @@ function MovieDisplay() {
                             </p>
 
                             {
-                                movie.crew?.directors?.length > 0 && (
-                                    <p>
-                                        <span>Director:</span> {movie.crew.directors.join(", ")}
-                                    </p>
-                                )
-                            }
-
-                            {
-                                movie.crew?.writers?.length > 0 && (
-                                    <p>
-                                        <span>Writers:</span> {movie.crew.writers.slice(0, 3).join(", ")}
-                                    </p>
-                                )
-                            }
-
-                            {
                                 movie.spokenLanguages?.length > 0 && (
                                     <p>
                                         <span>Languages:</span> {movie.spokenLanguages.join(", ")}
@@ -330,6 +328,150 @@ function MovieDisplay() {
             }
 
             {
+                directors.length > 0 && (
+                    <section className="MovieDisplay-Section">
+                        <h2>
+                            Director{directors.length > 1 ? "s" : ""}
+                        </h2>
+
+                        <div className="Director-List">
+                            {
+                                directors.map((director, index) => {
+                                    const clickable = Boolean(director.id)
+
+                                    return (
+                                        <article
+                                            className={
+                                                clickable
+                                                    ? "Director-Card Director-Card--Clickable"
+                                                    : "Director-Card"
+                                            }
+                                            key={director.id || `${director.name}-${index}`}
+                                            onClick={
+                                                clickable
+                                                    ? () => openPerson(director.id)
+                                                    : undefined
+                                            }
+                                            onKeyDown={
+                                                clickable
+                                                    ? (event) => handlePersonKeyDown(event, director.id)
+                                                    : undefined
+                                            }
+                                            role={clickable ? "button" : undefined}
+                                            tabIndex={clickable ? 0 : undefined}
+                                            aria-label={
+                                                clickable
+                                                    ? `View ${director.name} profile`
+                                                    : undefined
+                                            }
+                                        >
+                                            <div className="Director-Photo">
+                                                {
+                                                    director.profile?.url ? (
+                                                        <img
+                                                            src={director.profile.url}
+                                                            alt={director.name}
+                                                            loading="lazy"
+                                                        />
+                                                    ) : (
+                                                        <div className="Director-Fallback">
+                                                            {getInitials(director.name)}
+                                                        </div>
+                                                    )
+                                                }
+                                            </div>
+
+                                            <div className="Director-Info">
+                                                <span className="Crew-Role">
+                                                    Director
+                                                </span>
+                                                <h3>{director.name}</h3>
+                                            </div>
+
+                                            {
+                                                clickable && (
+                                                    <span className="Crew-Arrow" aria-hidden="true">
+                                                        →
+                                                    </span>
+                                                )
+                                            }
+                                        </article>
+                                    )
+                                })
+                            }
+                        </div>
+                    </section>
+                )
+            }
+
+            {
+                keyCrew.length > 0 && (
+                    <section className="MovieDisplay-Section">
+                        <h2>Key Crew</h2>
+
+                        <div className="Key-Crew-List">
+                            {
+                                keyCrew.map((member) => {
+                                    const clickable = Boolean(member.id)
+
+                                    return (
+                                        <article
+                                            className={
+                                                clickable
+                                                    ? "Key-Crew-Card Key-Crew-Card--Clickable"
+                                                    : "Key-Crew-Card"
+                                            }
+                                            key={member.id}
+                                            onClick={
+                                                clickable
+                                                    ? () => openPerson(member.id)
+                                                    : undefined
+                                            }
+                                            onKeyDown={
+                                                clickable
+                                                    ? (event) => handlePersonKeyDown(event, member.id)
+                                                    : undefined
+                                            }
+                                            role={clickable ? "button" : undefined}
+                                            tabIndex={clickable ? 0 : undefined}
+                                            aria-label={
+                                                clickable
+                                                    ? `View ${member.name} profile`
+                                                    : undefined
+                                            }
+                                        >
+                                            <div className="Key-Crew-Photo">
+                                                {
+                                                    member.profile?.url ? (
+                                                        <img
+                                                            src={member.profile.url}
+                                                            alt={member.name}
+                                                            loading="lazy"
+                                                        />
+                                                    ) : (
+                                                        <div className="Key-Crew-Fallback">
+                                                            {getInitials(member.name)}
+                                                        </div>
+                                                    )
+                                                }
+                                            </div>
+
+                                            <div className="Key-Crew-Info">
+                                                <span className="Crew-Role">
+                                                    {member.job || member.department || "Crew"}
+                                                </span>
+                                                <h3>{member.name}</h3>
+                                            </div>
+                                        </article>
+                                    )
+                                })
+                            }
+                        </div>
+                    </section>
+                )
+            }
+
+            {
                 movie.cast?.length > 0 && (
                     <section className="MovieDisplay-Section">
                         <h2>Top Cast</h2>
@@ -337,7 +479,15 @@ function MovieDisplay() {
                         <div className="Cast-List">
                             {
                                 movie.cast.slice(0, 12).map((member) => (
-                                    <div className="Cast-Card" key={member.id}>
+                                    <article
+                                        className="Cast-Card Cast-Card--Clickable"
+                                        key={`${member.id}-${member.order}`}
+                                        onClick={() => openPerson(member.id)}
+                                        onKeyDown={(event) => handlePersonKeyDown(event, member.id)}
+                                        role="button"
+                                        tabIndex={0}
+                                        aria-label={`View ${member.actor} profile`}
+                                    >
                                         {
                                             member.profile?.url ? (
                                                 <img
@@ -354,7 +504,7 @@ function MovieDisplay() {
 
                                         <h3>{member.actor}</h3>
                                         <p>{member.character || "Cast"}</p>
-                                    </div>
+                                    </article>
                                 ))
                             }
                         </div>

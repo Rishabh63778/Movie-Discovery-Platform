@@ -1,0 +1,732 @@
+.Person-Page {
+    min-height: 100vh;
+
+    background:
+        radial-gradient(circle at 82% 0%, rgba(229, 9, 20, 0.14), transparent 32%),
+        radial-gradient(circle at 0% 90%, rgba(255, 60, 60, 0.05), transparent 30%),
+        #0f0f0f;
+
+    color: white;
+}
+
+.Person-Main {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 38px 24px 70px;
+}
+
+.Person-Back {
+    display: inline-block;
+    margin-bottom: 24px;
+
+    color: #cccccc;
+    text-decoration: none;
+    font-size: 15px;
+    transition: color 0.25s ease;
+}
+
+.Person-Back:hover {
+    color: #ff3c3c;
+}
+
+.Person-Hero {
+    display: flex;
+    align-items: flex-start;
+    gap: 42px;
+
+    padding: 36px;
+
+    background:
+        linear-gradient(135deg, rgba(229, 9, 20, 0.14), transparent 56%),
+        rgba(23, 23, 23, 0.96);
+
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
+
+    box-shadow: 0 30px 70px rgba(0, 0, 0, 0.42);
+}
+
+.Person-Photo-Wrap {
+    flex: 0 0 290px;
+}
+
+.Person-Photo {
+    width: 100%;
+    aspect-ratio: 2 / 3;
+    object-fit: cover;
+    display: block;
+
+    border-radius: 16px;
+    box-shadow: 0 18px 42px rgba(0, 0, 0, 0.45);
+}
+
+.Person-Photo-Fallback {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: linear-gradient(135deg, #303030, #171717);
+    color: #dddddd;
+    font-size: 64px;
+    font-weight: 700;
+    letter-spacing: 2px;
+}
+
+.Person-Identity {
+    flex: 1;
+    min-width: 0;
+    padding-top: 8px;
+}
+
+.Person-Eyebrow {
+    margin-bottom: 10px;
+
+    color: #ff8b8b;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+}
+
+.Person-Identity h1 {
+    margin-bottom: 16px;
+
+    font-size: clamp(2.2rem, 4.5vw, 3.7rem);
+    line-height: 1.05;
+    overflow-wrap: anywhere;
+}
+
+.Person-Meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 20px;
+
+    margin-bottom: 14px;
+
+    color: #c9c9c9;
+    font-size: 15px;
+    line-height: 1.5;
+}
+
+.Person-AlsoKnownAs {
+    margin-bottom: 18px;
+
+    color: #9f9f9f;
+    font-size: 14px;
+    line-height: 1.55;
+}
+
+.Person-KnownFor {
+    margin-bottom: 20px;
+}
+
+.Person-KnownFor-Label {
+    display: block;
+    margin-bottom: 8px;
+
+    color: #8f8f8f;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.Person-KnownFor-List {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.Person-KnownFor-Chip {
+    padding: 7px 12px;
+
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 999px;
+
+    color: #e6e6e6;
+    font: inherit;
+    font-size: 12.5px;
+    line-height: 1.3;
+
+    cursor: pointer;
+    transition:
+        background 0.25s ease,
+        border-color 0.25s ease,
+        color 0.25s ease;
+}
+
+.Person-KnownFor-Chip:hover {
+    background: rgba(229, 9, 20, 0.16);
+    border-color: rgba(255, 60, 60, 0.6);
+    color: #ffffff;
+}
+
+.Person-KnownFor-Chip--Static {
+    color: #bdbdbd;
+    cursor: default;
+}
+
+.Person-KnownFor-Chip--Static:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.12);
+    color: #bdbdbd;
+}
+
+.Person-Links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 9px;
+    margin-top: 4px;
+}
+
+.Person-Link {
+    padding: 8px 14px;
+
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    border-radius: 8px;
+
+    color: #d7d7d7;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 600;
+
+    transition:
+        background 0.25s ease,
+        border-color 0.25s ease,
+        color 0.25s ease;
+}
+
+.Person-Link:hover {
+    background: rgba(229, 9, 20, 0.12);
+    border-color: rgba(255, 60, 60, 0.6);
+    color: #ffffff;
+}
+
+.Person-Content {
+    display: grid;
+    gap: 28px;
+    margin-top: 30px;
+}
+
+.Person-Section {
+    padding: 28px 30px;
+
+    background: #161616;
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 16px;
+}
+
+.Person-Section h2 {
+    margin-bottom: 18px;
+
+    font-size: 24px;
+    line-height: 1.2;
+}
+
+.Person-Bio-Text {
+    color: #c7c7c7;
+    font-size: 15.5px;
+    line-height: 1.75;
+    white-space: pre-line;
+
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.Person-Bio-Text--Expanded {
+    display: block;
+    overflow: visible;
+}
+
+.Person-Bio-Toggle {
+    margin-top: 12px;
+    padding: 0;
+
+    background: none;
+    border: none;
+
+    color: #ff8b8b;
+    font: inherit;
+    font-size: 13px;
+    font-weight: 600;
+
+    cursor: pointer;
+    transition: color 0.25s ease;
+}
+
+.Person-Bio-Toggle:hover {
+    color: #ffffff;
+}
+
+.Person-Empty {
+    color: #9f9f9f;
+    font-size: 14.5px;
+    line-height: 1.65;
+}
+
+.Person-Details-Grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 14px;
+}
+
+.Person-Detail {
+    padding: 16px;
+
+    background: rgba(255, 255, 255, 0.025);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 12px;
+}
+
+.Person-Detail span {
+    display: block;
+    margin-bottom: 6px;
+
+    color: #8f8f8f;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+}
+
+.Person-Detail strong {
+    color: #f0f0f0;
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1.45;
+    overflow-wrap: anywhere;
+}
+
+.Person-Awards-Note {
+    margin-bottom: 16px;
+
+    color: #8f8f8f;
+    font-size: 12.5px;
+    line-height: 1.6;
+}
+
+.Person-Awards-Note a {
+    color: #ff8b8b;
+    text-decoration: none;
+}
+
+.Person-Awards-Note a:hover {
+    color: #ffffff;
+}
+
+.Person-Awards-Groups {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 22px;
+}
+
+.Person-Awards-Group h3 {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+
+    margin-bottom: 10px;
+
+    color: #f0f0f0;
+    font-size: 15px;
+    line-height: 1.3;
+}
+
+.Person-Awards-Group h3 span {
+    min-width: 26px;
+    padding: 3px 8px;
+
+    background: rgba(229, 9, 20, 0.14);
+    border: 1px solid rgba(229, 9, 20, 0.35);
+    border-radius: 999px;
+
+    color: #ffb3b3;
+    font-size: 11px;
+    text-align: center;
+}
+
+.Person-Awards-Group ul {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.Person-Awards-Group li {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 14px;
+
+    padding: 11px 13px;
+
+    background: rgba(255, 255, 255, 0.025);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 10px;
+}
+
+.Person-Award-Name {
+    color: #dcdcdc;
+    font-size: 13.5px;
+    line-height: 1.45;
+}
+
+.Person-Award-Year {
+    flex: 0 0 auto;
+
+    color: #ff9b9b;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.Person-Awards-Unavailable {
+    padding: 18px;
+
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px dashed rgba(255, 255, 255, 0.12);
+    border-radius: 12px;
+
+    color: #b9b9b9;
+    font-size: 14px;
+    line-height: 1.65;
+}
+
+.Person-Awards-Unavailable p + p {
+    margin-top: 10px;
+}
+
+.Person-Awards-Unavailable .Person-Awards-Note {
+    margin-bottom: 0;
+}
+
+.Person-Awards-Skeleton {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.Person-Awards-Skeleton-Line {
+    height: 46px;
+    border-radius: 10px;
+}
+
+.Person-Awards-Skeleton-Line--Short {
+    width: 45%;
+}
+
+.Person-Awards-Skeleton-Line--Medium {
+    width: 72%;
+}
+
+.Person-Filmography-Header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+
+    margin-bottom: 18px;
+}
+
+.Person-Filmography-Header h2 {
+    margin-bottom: 0;
+}
+
+.Person-Filmography-Header > span {
+    color: #8f8f8f;
+    font-size: 13px;
+    white-space: nowrap;
+}
+
+.Person-Filmography-Tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+
+    margin-bottom: 22px;
+    padding-bottom: 18px;
+
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.Person-Filmography-Tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+
+    padding: 9px 14px;
+
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 999px;
+
+    color: #c9c9c9;
+    font: inherit;
+    font-size: 13px;
+    font-weight: 600;
+
+    cursor: pointer;
+    transition:
+        background 0.25s ease,
+        border-color 0.25s ease,
+        color 0.25s ease;
+}
+
+.Person-Filmography-Tab span {
+    color: #8f8f8f;
+    font-size: 11px;
+}
+
+.Person-Filmography-Tab:hover {
+    border-color: rgba(255, 255, 255, 0.24);
+    color: #ffffff;
+}
+
+.Person-Filmography-Tab--Active {
+    background: rgba(229, 9, 20, 0.16);
+    border-color: rgba(255, 60, 60, 0.55);
+    color: #ffffff;
+}
+
+.Person-Filmography-Tab--Active span {
+    color: #ffb3b3;
+}
+
+.Filmography-Grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(165px, 1fr));
+    gap: 18px;
+}
+
+.Person-State {
+    min-height: 50vh;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+
+    padding: 40px 20px;
+    text-align: center;
+}
+
+.Person-State h1 {
+    font-size: 34px;
+    line-height: 1.2;
+}
+
+.Person-State p {
+    color: #a9a9a9;
+    font-size: 15px;
+}
+
+.Person-State-Button {
+    margin-top: 8px;
+    padding: 12px 22px;
+
+    background: #e50914;
+    border: none;
+    border-radius: 8px;
+
+    color: white;
+    font: inherit;
+    font-weight: 600;
+
+    cursor: pointer;
+    transition: background 0.25s ease;
+}
+
+.Person-State-Button:hover {
+    background: #c40812;
+}
+
+.Person-Skeleton-Hero {
+    display: flex;
+    align-items: flex-start;
+    gap: 42px;
+
+    padding: 36px;
+
+    background: #171717;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
+}
+
+.Person-Skeleton-Photo {
+    flex: 0 0 290px;
+    aspect-ratio: 2 / 3;
+    border-radius: 16px;
+}
+
+.Person-Skeleton-Identity {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+
+    padding-top: 20px;
+}
+
+.Person-Skeleton-Line {
+    width: 100%;
+    height: 16px;
+    border-radius: 6px;
+}
+
+.Person-Skeleton-Line--Short {
+    width: 30%;
+}
+
+.Person-Skeleton-Line--Title {
+    width: 70%;
+    height: 54px;
+}
+
+.Person-Skeleton-Line--Medium {
+    width: 55%;
+}
+
+.Person-Skeleton-Section {
+    height: 160px;
+    margin-top: 28px;
+    border-radius: 16px;
+}
+
+.Person-Skeleton-Section--Tall {
+    height: 320px;
+}
+
+.Person-Attribution {
+    margin-top: 32px;
+
+    color: #777777;
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+.Person-Attribution a {
+    color: #a9a9a9;
+    text-decoration: none;
+}
+
+.Person-Attribution a:hover {
+    color: #ff3c3c;
+}
+
+@media (max-width: 900px) {
+    .Person-Main {
+        padding: 28px 18px 60px;
+    }
+
+    .Person-Hero {
+        flex-direction: column;
+        gap: 26px;
+        padding: 26px;
+    }
+
+    .Person-Photo-Wrap {
+        flex: none;
+        width: min(260px, 100%);
+    }
+
+    .Person-Identity h1 {
+        font-size: 2.4rem;
+    }
+
+    .Person-Section {
+        padding: 24px 22px;
+    }
+
+    .Person-Skeleton-Hero {
+        flex-direction: column;
+        padding: 26px;
+    }
+
+    .Person-Skeleton-Photo {
+        flex: none;
+        width: min(260px, 100%);
+    }
+}
+
+@media (max-width: 600px) {
+    .Person-Main {
+        padding: 22px 14px 50px;
+    }
+
+    .Person-Hero {
+        padding: 20px;
+        border-radius: 16px;
+    }
+
+    .Person-Photo-Wrap {
+        width: min(230px, 100%);
+    }
+
+    .Person-Identity h1 {
+        font-size: 2rem;
+    }
+
+    .Person-Meta {
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .Person-Section {
+        padding: 20px 16px;
+    }
+
+    .Person-Section h2 {
+        font-size: 20px;
+    }
+
+    .Person-Details-Grid {
+        grid-template-columns: 1fr;
+    }
+
+    .Person-Awards-Groups {
+        grid-template-columns: 1fr;
+    }
+
+    .Person-Awards-Group li {
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .Person-Filmography-Header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+    }
+
+    .Person-Filmography-Tab {
+        padding: 8px 11px;
+        font-size: 12px;
+    }
+
+    .Filmography-Grid {
+        grid-template-columns: repeat(auto-fill, minmax(135px, 1fr));
+        gap: 14px;
+    }
+
+    .Person-Skeleton-Hero {
+        padding: 20px;
+    }
+
+    .Person-Skeleton-Photo {
+        width: min(230px, 100%);
+    }
+
+    .Person-Skeleton-Line--Title {
+        width: 85%;
+        height: 40px;
+    }
+}

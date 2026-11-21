@@ -1,7 +1,10 @@
-import { useEffect, useRef, useState } from "react"
-import { Link, useNavigate } from "react-router-dom"
+import { useCallback, useEffect, useRef, useState } from "react"
+import { useNavigate } from "react-router-dom"
 import api from "../api/axios.js"
 import MovieCard from "../components/MovieCard.jsx"
+import Navbar from "../components/Navbar.jsx"
+import PersonCard from "../components/PersonCard.jsx"
+import TvCard from "../components/TvCard.jsx"
 import "../styles/Home.css"
 
 const HOME_SECTIONS = [
@@ -36,10 +39,12 @@ function Home() {
 
     const [searchInput, setSearchInput] = useState("")
     const [searchQuery, setSearchQuery] = useState("")
-    const [searchResults, setSearchResults] = useState([])
+    const [searchResults, setSearchResults] = useState(null)
     const [searching, setSearching] = useState(false)
     const [searchError, setSearchError] = useState("")
     const searchRequestRef = useRef(0)
+    const searchAbortRef = useRef(null)
+    const searchDebounceRef = useRef(null)
 
     useEffect(() => {
         let cancelled = false
@@ -82,8 +87,108 @@ function Home() {
         }
     }, [])
 
-    const handlesearch = async (event) => {
+    const performSearch = useCallback(async (rawQuery) => {
+        const query = rawQuery.trim()
+
+        if (!query) return
+
+        if (searchAbortRef.current) {
+            searchAbortRef.current.abort()
+        }
+
+        const controller = new AbortController()
+        searchAbortRef.current = controller
+
+        const requestId = searchRequestRef.current + 1
+        searchRequestRef.current = requestId
+
+        setSearching(true)
+        setSearchError("")
+        setSearchQuery(query)
+        setSearchResults(null)
+
+        try {
+            const response = await api.get("/search/multi", {
+                params: { query },
+                signal: controller.signal
+            })
+
+            if (requestId !== searchRequestRef.current) return
+
+            setSearchResults(response.data.data)
+        } catch (err) {
+            if (requestId !== searchRequestRef.current) return
+
+            if (err.code === "ERR_CANCELED" || err.name === "CanceledError") {
+                return
+            }
+
+            setSearchResults({
+                movies: [],
+                tv: [],
+                people: [],
+                counts: { movies: 0, tv: 0, people: 0, total: 0 }
+            })
+            setSearchError(
+                err.response?.data?.message
+                || "Unable to search movies, TV shows and people right now."
+            )
+        } finally {
+            if (requestId === searchRequestRef.current) {
+                setSearching(false)
+            }
+        }
+    }, [])
+
+    useEffect(() => () => {
+        if (searchDebounceRef.current) {
+            clearTimeout(searchDebounceRef.current)
+        }
+
+        searchAbortRef.current?.abort()
+    }, [])
+
+    const handleSearchInputChange = (event) => {
+        const value = event.target.value
+        const query = value.trim()
+
+        setSearchInput(value)
+
+        if (searchDebounceRef.current) {
+            clearTimeout(searchDebounceRef.current)
+        }
+
+        searchAbortRef.current?.abort()
+        searchRequestRef.current += 1
+
+        if (query.length < 2) {
+            setSearchQuery("")
+            setSearchResults(null)
+            setSearchError("")
+            setSearching(false)
+            return
+        }
+
+        if (query === searchQuery && searchResults && !searchError) {
+            return
+        }
+
+        setSearchQuery(query)
+        setSearchResults(null)
+        setSearchError("")
+        setSearching(true)
+
+        searchDebounceRef.current = setTimeout(() => {
+            performSearch(query)
+        }, 350)
+    }
+
+    const handlesearch = (event) => {
         event.preventDefault()
+
+        if (searchDebounceRef.current) {
+            clearTimeout(searchDebounceRef.current)
+        }
 
         const query = searchInput.trim()
 
@@ -92,41 +197,24 @@ function Home() {
             return
         }
 
-        const requestId = searchRequestRef.current + 1
-        searchRequestRef.current = requestId
-
-        setSearching(true)
-        setSearchError("")
-
-        try {
-            const response = await api.get("/movies/search", {
-                params: { query }
-            })
-
-            if (requestId !== searchRequestRef.current) return
-
-            setSearchResults(response.data.data.results)
-            setSearchQuery(query)
-        } catch (err) {
-            if (requestId !== searchRequestRef.current) return
-
-            setSearchResults([])
-            setSearchQuery(query)
-            setSearchError(
-                err.response?.data?.message || "Unable to search movies right now."
-            )
-        } finally {
-            if (requestId === searchRequestRef.current) {
-                setSearching(false)
-            }
+        if (query === searchQuery && searchResults && !searchError) {
+            return
         }
+
+        performSearch(query)
     }
 
     const clearsearch = () => {
+        if (searchDebounceRef.current) {
+            clearTimeout(searchDebounceRef.current)
+        }
+
+        searchAbortRef.current?.abort()
         searchRequestRef.current += 1
+
         setSearchInput("")
         setSearchQuery("")
-        setSearchResults([])
+        setSearchResults(null)
         setSearchError("")
         setSearching(false)
     }
@@ -139,18 +227,17 @@ function Home() {
         }
         : undefined
 
+    const searchCounts = searchResults?.counts || {
+        movies: 0,
+        tv: 0,
+        people: 0,
+        total: 0
+    }
+
     return (
         <div className="Home">
 
-            <header className="Top-Bar">
-                <Link to="/home" className="Brand">
-                    CineScope
-                </Link>
-
-                <nav className="Top-Bar-Links">
-                    <Link to="/favourites">Favourites</Link>
-                </nav>
-            </header>
+            <Navbar />
 
             <div className="Hero" style={heroStyle}>
 
@@ -161,17 +248,17 @@ function Home() {
                     </h1>
 
                     <p>
-                        Browse, search and explore your favorite movies.
+                        Browse movies, discover TV shows and explore the people behind them.
                     </p>
 
                     <form className="Search-Bar" onSubmit={handlesearch}>
 
                         <input
                             type="text"
-                            placeholder="Search movies..."
+                            placeholder="Search movies, TV shows, actors or directors..."
                             value={searchInput}
-                            onChange={(event) => setSearchInput(event.target.value)}
-                            aria-label="Search movies"
+                            onChange={handleSearchInputChange}
+                            aria-label="Search movies, TV shows, actors and directors"
                         />
 
                         <button type="submit">
@@ -179,7 +266,7 @@ function Home() {
                         </button>
 
                         {
-                            searchQuery && (
+                            searchInput && (
                                 <button
                                     type="button"
                                     className="Clear-Search"
@@ -212,7 +299,7 @@ function Home() {
 
             {
                 searchQuery ? (
-                    <section className="Movies-Section">
+                    <section className="Movies-Section Search-Results">
 
                         <h2>
                             Search Results for "{searchQuery}"
@@ -220,27 +307,124 @@ function Home() {
 
                         {
                             searching ? (
-                                <p className="Loading">Searching movies...</p>
-                            ) : searchError ? (
-                                <p className="Error">{searchError}</p>
-                            ) : searchResults.length > 0 ? (
-                                <>
-                                    <p className="Results-Count">
-                                        Showing {searchResults.length} results
+                                <div
+                                    className="Search-Skeleton"
+                                    role="status"
+                                    aria-label="Searching movies, TV shows and people"
+                                >
+                                    <p className="Search-Status">
+                                        Searching movies, TV shows and people...
                                     </p>
 
-                                    <div className="Movie-Grid">
+                                    <div className="Search-Skeleton-Grid" aria-hidden="true">
                                         {
-                                            searchResults.map((movie) => (
-                                                <MovieCard key={movie.id} movie={movie} />
+                                            Array.from({ length: 8 }).map((_, index) => (
+                                                <div className="Search-Skeleton-Card" key={index}>
+                                                    <div className="Skeleton-Block Search-Skeleton-Poster" />
+
+                                                    <div className="Search-Skeleton-Info">
+                                                        <div className="Skeleton-Block Search-Skeleton-Line" />
+                                                        <div className="Skeleton-Block Search-Skeleton-Line Search-Skeleton-Line--Short" />
+                                                    </div>
+                                                </div>
                                             ))
                                         }
                                     </div>
-                                </>
+                                </div>
+                            ) : searchError ? (
+                                <div className="Search-Error">
+                                    <p className="Error">{searchError}</p>
+
+                                    <button
+                                        type="button"
+                                        className="Search-Retry"
+                                        onClick={() => performSearch(searchQuery)}
+                                    >
+                                        Try again
+                                    </button>
+                                </div>
+                            ) : searchResults ? (
+                                searchCounts.total > 0 ? (
+                                    <>
+                                        <p className="Results-Count">
+                                            Showing {searchCounts.total} results across
+                                            movies, TV shows and people
+                                        </p>
+
+                                        {
+                                            searchCounts.movies > 0 && (
+                                                <div className="Search-Category">
+                                                    <div className="Search-Category-Header">
+                                                        <h3>Movies</h3>
+                                                        <span>{searchCounts.movies}</span>
+                                                    </div>
+
+                                                    <div className="Movie-Grid">
+                                                        {
+                                                            searchResults.movies.map((movie) => (
+                                                                <MovieCard
+                                                                    key={movie.id}
+                                                                    movie={movie}
+                                                                />
+                                                            ))
+                                                        }
+                                                    </div>
+                                                </div>
+                                            )
+                                        }
+
+                                        {
+                                            searchCounts.tv > 0 && (
+                                                <div className="Search-Category">
+                                                    <div className="Search-Category-Header">
+                                                        <h3>TV Shows</h3>
+                                                        <span>{searchCounts.tv}</span>
+                                                    </div>
+
+                                                    <div className="Movie-Grid">
+                                                        {
+                                                            searchResults.tv.map((show) => (
+                                                                <TvCard
+                                                                    key={show.id}
+                                                                    show={show}
+                                                                />
+                                                            ))
+                                                        }
+                                                    </div>
+                                                </div>
+                                            )
+                                        }
+
+                                        {
+                                            searchCounts.people > 0 && (
+                                                <div className="Search-Category">
+                                                    <div className="Search-Category-Header">
+                                                        <h3>People</h3>
+                                                        <span>{searchCounts.people}</span>
+                                                    </div>
+
+                                                    <div className="Movie-Grid">
+                                                        {
+                                                            searchResults.people.map((person) => (
+                                                                <PersonCard
+                                                                    key={person.id}
+                                                                    person={person}
+                                                                />
+                                                            ))
+                                                        }
+                                                    </div>
+                                                </div>
+                                            )
+                                        }
+                                    </>
+                                ) : (
+                                    <p className="No-Movies">
+                                        No movies, TV shows or people found for
+                                        "{searchQuery}"
+                                    </p>
+                                )
                             ) : (
-                                <p className="No-Movies">
-                                    No movies found for "{searchQuery}"
-                                </p>
+                                <p className="Loading">Searching...</p>
                             )
                         }
 

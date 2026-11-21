@@ -1,4 +1,5 @@
 import ApiError from "../utils/apierror.js"
+import { getAwardsForWikidataId } from "./awards.service.js"
 
 const TMDB_API_BASE = (process.env.TMDB_BASE_URL || "https://api.themoviedb.org/3").replace(/\/$/, "")
 const TMDB_IMAGE_BASE = (process.env.TMDB_IMAGE_BASE_URL || "https://image.tmdb.org/t/p/").replace(/\/?$/, "/")
@@ -20,6 +21,7 @@ const MOVIE_CATEGORIES = {
 
 const responseCache = new Map()
 let genreCache = null
+let tvGenreCache = null
 
 const getAccessToken = () => {
     const token = process.env.TMDB_ACCESS_TOKEN
@@ -209,6 +211,43 @@ const normalizeMovie = (raw = {}, genreMap = new Map()) => {
     }
 }
 
+const normalizeTv = (raw = {}, genreMap = new Map()) => {
+    const genreIds = Array.isArray(raw.genre_ids)
+        ? raw.genre_ids
+        : (raw.genres || []).map((genre) => genre.id)
+
+    const genres = genreIds
+        .map((id) => ({ id, name: genreMap.get(id) }))
+        .filter((genre) => genre.name)
+
+    const poster = getImage(raw.poster_path, "w500")
+    const backdrop = getImage(raw.backdrop_path, "w1280")
+    const firstAirDate = raw.first_air_date || null
+
+    return {
+        id: raw.id,
+        title: raw.name || raw.original_name || "Untitled",
+        originalTitle: raw.original_name || null,
+        description: raw.overview || "No description available.",
+        overview: raw.overview || "",
+        poster,
+        backdrop,
+        posterUrl: poster?.url || null,
+        backdropUrl: backdrop?.url || null,
+        releaseDate: firstAirDate,
+        year: getYear(firstAirDate),
+        rating: getRating(raw.vote_average),
+        voteCount: raw.vote_count || 0,
+        popularity: raw.popularity ?? null,
+        originalLanguage: raw.original_language || null,
+        adult: Boolean(raw.adult),
+        genreIds,
+        genres,
+        genre: genres.map((genre) => genre.name),
+        type: "tv"
+    }
+}
+
 const normalizeList = (payload = {}, genreMap = new Map()) => ({
     results: Array.isArray(payload.results)
         ? payload.results.map((movie) => normalizeMovie(movie, genreMap))
@@ -231,6 +270,26 @@ const getGenreMap = async () => {
     )
 
     genreCache = {
+        data: map,
+        expiresAt: Date.now() + GENRE_TTL_MS
+    }
+
+    return map
+}
+
+const getTvGenreMap = async () => {
+    if (tvGenreCache && tvGenreCache.expiresAt > Date.now()) {
+        return tvGenreCache.data
+    }
+
+    const payload = await requestTmdb("/genre/tv/list", {}, GENRE_TTL_MS)
+    const map = new Map(
+        (payload.genres || [])
+            .filter((genre) => genre?.id && genre?.name)
+            .map((genre) => [genre.id, genre.name])
+    )
+
+    tvGenreCache = {
         data: map,
         expiresAt: Date.now() + GENRE_TTL_MS
     }
@@ -343,6 +402,364 @@ const discoverMoviesByGenre = async (genreId, page) => {
     }
 }
 
+const normalizePersonSummary = (raw = {}) => {
+    const profile = getImage(raw.profile_path, "w185")
+
+    const knownFor = (Array.isArray(raw.known_for) ? raw.known_for : [])
+        .filter((item) => item?.id)
+        .map((item) => {
+            const isTv = item.media_type === "tv" || (!item.title && Boolean(item.name))
+            const poster = getImage(item.poster_path, "w185")
+
+            return {
+                id: item.id,
+                title: item.title || item.name || "Untitled",
+                year: getYear(item.release_date || item.first_air_date),
+                type: isTv ? "tv" : "movie",
+                poster,
+                posterUrl: poster?.url || null,
+                rating: getRating(item.vote_average)
+            }
+        })
+
+    return {
+        id: raw.id,
+        name: raw.name || "Unknown person",
+        profile,
+        profileUrl: profile?.url || null,
+        knownForDepartment: raw.known_for_department || null,
+        popularity: raw.popularity ?? null,
+        adult: Boolean(raw.adult),
+        knownFor,
+        knownForText: knownFor
+            .slice(0, 3)
+            .map((item) => item.title)
+            .join(", "),
+        type: "person"
+    }
+}
+
+const searchMulti = async (query, page) => {
+    const cleanQuery = String(query || "").trim()
+
+    if (!cleanQuery) {
+        throw new ApiError(400, "Search query is required")
+    }
+
+    const [payload, movieGenreMap, tvGenreMap] = await Promise.all([
+        requestTmdb(
+            "/search/multi",
+            {
+                query: cleanQuery,
+                page,
+                include_adult: false
+            },
+            LIST_TTL_MS
+        ),
+        getGenreMap().catch(() => new Map()),
+        getTvGenreMap().catch(() => new Map())
+    ])
+
+    const movies = []
+    const tv = []
+    const people = []
+    const results = []
+
+    ;(payload.results || []).forEach((item) => {
+        if (item.media_type === "movie") {
+            const normalized = normalizeMovie(item, movieGenreMap)
+            movies.push(normalized)
+            results.push(normalized)
+            return
+        }
+
+        if (item.media_type === "tv") {
+            const normalized = normalizeTv(item, tvGenreMap)
+            tv.push(normalized)
+            results.push(normalized)
+            return
+        }
+
+        if (item.media_type === "person") {
+            const normalized = normalizePersonSummary(item)
+            people.push(normalized)
+            results.push(normalized)
+        }
+    })
+
+    return {
+        query: cleanQuery,
+        page: payload.page || page || 1,
+        totalPages: Math.min(payload.total_pages || 0, 500),
+        totalResults: payload.total_results || 0,
+        results,
+        movies,
+        tv,
+        people,
+        counts: {
+            movies: movies.length,
+            tv: tv.length,
+            people: people.length,
+            total: results.length
+        }
+    }
+}
+
+const normalizeCrewMember = (member = {}) => {
+    const profile = getImage(member.profile_path, "w185")
+
+    return {
+        id: member.id,
+        name: member.name || "Unknown",
+        job: member.job || null,
+        department: member.department || null,
+        profile,
+        profileUrl: profile?.url || null
+    }
+}
+
+const buildDirectors = (crew = []) => {
+    const seen = new Set()
+    const directors = []
+
+    crew.forEach((member) => {
+        if (member.job !== "Director" || !member.id || seen.has(member.id)) return
+
+        seen.add(member.id)
+        directors.push(normalizeCrewMember(member))
+    })
+
+    return directors
+}
+
+const KEY_CREW_WRITING_JOBS = new Set([
+    "Screenplay",
+    "Writer",
+    "Story",
+    "Teleplay",
+    "Screenstory",
+    "Adaptation",
+    "Dialogue",
+    "Scenario",
+    "Script",
+    "Script Editor"
+])
+
+const KEY_CREW_JOBS = [
+    "Screenplay",
+    "Writer",
+    "Story",
+    "Teleplay",
+    "Screenstory",
+    "Adaptation",
+    "Dialogue",
+    "Scenario",
+    "Script",
+    "Script Editor",
+    "Producer",
+    "Executive Producer",
+    "Director of Photography",
+    "Original Music Composer",
+    "Editor",
+    "Production Designer",
+    "Casting"
+]
+
+const buildKeyCrew = (crew = [], excludedIds = new Set()) => {
+    const seen = new Set()
+    const keyCrew = []
+
+    KEY_CREW_JOBS.forEach((job) => {
+        crew.forEach((member) => {
+            if (member.job !== job || !member.id || seen.has(member.id)) return
+
+            const isWritingJob = KEY_CREW_WRITING_JOBS.has(job)
+
+            // Directors get their own section, but writer-directors still
+            // belong in Key Crew because their writing credit matters.
+            if (!isWritingJob && excludedIds.has(member.id)) return
+
+            seen.add(member.id)
+            keyCrew.push({
+                ...normalizeCrewMember(member),
+                job: isWritingJob ? "Writer" : member.job,
+                creditJob: member.job
+            })
+        })
+    })
+
+    return keyCrew.slice(0, 8)
+}
+
+const WRITING_JOBS = new Set([
+    "Writer",
+    "Screenplay",
+    "Story",
+    "Teleplay",
+    "Screenstory",
+    "Characters",
+    "Novel",
+    "Theatre Play",
+    "Adaptation",
+    "Dialogue",
+    "Scenario",
+    "Script",
+    "Script Editor",
+    "Author",
+    "Comic Book"
+])
+
+const isProductionJob = (job = "") => {
+    return job.includes("Producer")
+        || job === "Production Manager"
+        || job === "Production Supervisor"
+        || job === "Casting"
+}
+
+const normalizeCreditBase = (raw = {}) => {
+    const poster = getImage(raw.poster_path, "w342")
+
+    return {
+        id: raw.id,
+        movieId: raw.id,
+        title: raw.title || raw.original_title || "Untitled",
+        originalTitle: raw.original_title || null,
+        poster,
+        posterUrl: poster?.url || null,
+        releaseDate: raw.release_date || null,
+        year: getYear(raw.release_date),
+        rating: getRating(raw.vote_average),
+        voteCount: raw.vote_count || 0,
+        popularity: raw.popularity ?? null,
+        type: "movie"
+    }
+}
+
+const addFilmographyCredit = (map, raw, category, role, job) => {
+    if (!raw?.id) return
+
+    const existing = map.get(raw.id)
+
+    if (existing) {
+        if (role && !existing.roles.includes(role)) {
+            existing.roles.push(role)
+        }
+
+        if (job && !existing.jobs.includes(job)) {
+            existing.jobs.push(job)
+        }
+
+        if (!existing.releaseDate && raw.release_date) {
+            existing.releaseDate = raw.release_date
+            existing.year = getYear(raw.release_date)
+        }
+
+        return
+    }
+
+    map.set(raw.id, {
+        ...normalizeCreditBase(raw),
+        category,
+        roles: role ? [role] : [],
+        jobs: job ? [job] : []
+    })
+}
+
+const sortFilmography = (credits) => {
+    return credits.sort((a, b) => {
+        if (a.releaseDate && b.releaseDate && a.releaseDate !== b.releaseDate) {
+            return a.releaseDate < b.releaseDate ? 1 : -1
+        }
+
+        if (a.releaseDate && !b.releaseDate) return -1
+        if (!a.releaseDate && b.releaseDate) return 1
+
+        return (b.popularity || 0) - (a.popularity || 0)
+    })
+}
+
+const finalizeFilmography = (map) => {
+    return sortFilmography(
+        Array.from(map.values()).map((credit) => ({
+            ...credit,
+            role: credit.roles.join(" / ") || credit.jobs.join(" / ") || "Cast",
+            job: credit.jobs.join(" / ") || null,
+            roles: undefined,
+            jobs: undefined
+        }))
+    )
+}
+
+const buildFilmography = (rawCredits = {}) => {
+    const acting = new Map()
+    const directing = new Map()
+    const writing = new Map()
+    const production = new Map()
+
+    ;(rawCredits.cast || []).forEach((credit) => {
+        addFilmographyCredit(
+            acting,
+            credit,
+            "acting",
+            credit.character || "Cast",
+            null
+        )
+    })
+
+    ;(rawCredits.crew || []).forEach((credit) => {
+        const job = credit.job || ""
+
+        if (job === "Director") {
+            addFilmographyCredit(directing, credit, "directing", job, job)
+        }
+
+        if (WRITING_JOBS.has(job)) {
+            addFilmographyCredit(writing, credit, "writing", job, job)
+        }
+
+        if (isProductionJob(job)) {
+            addFilmographyCredit(production, credit, "production", job, job)
+        }
+    })
+
+    const actingCredits = finalizeFilmography(acting)
+    const directingCredits = finalizeFilmography(directing)
+    const writingCredits = finalizeFilmography(writing)
+    const productionCredits = finalizeFilmography(production)
+
+    const allById = new Map()
+
+    ;[
+        ...actingCredits,
+        ...directingCredits,
+        ...writingCredits,
+        ...productionCredits
+    ].forEach((credit) => {
+        if (!allById.has(credit.id)) {
+            allById.set(credit.id, credit)
+        }
+    })
+
+    const knownFor = Array.from(allById.values())
+        .sort((a, b) => (b.popularity || 0) - (a.popularity || 0))
+        .slice(0, 6)
+
+    return {
+        acting: actingCredits,
+        directing: directingCredits,
+        writing: writingCredits,
+        production: productionCredits,
+        knownFor,
+        counts: {
+            acting: actingCredits.length,
+            directing: directingCredits.length,
+            writing: writingCredits.length,
+            production: productionCredits.length,
+            total: allById.size
+        }
+    }
+}
+
 const normalizeVideo = (video) => ({
     id: video.id,
     key: video.key,
@@ -373,18 +790,35 @@ const getMovieDetails = async (movieId) => {
         actor: member.name,
         character: member.character || "",
         profile: getImage(member.profile_path, "w185"),
+        profileUrl: member.profile_path
+            ? `${TMDB_IMAGE_BASE}w185${member.profile_path}`
+            : null,
+        department: member.known_for_department || "Acting",
         order: member.order
     }))
 
     const crew = payload.credits?.crew || []
-    const directors = Array.from(new Set(
-        crew.filter((member) => member.job === "Director").map((member) => member.name)
-    ))
-    const writers = Array.from(new Set(
-        crew
-            .filter((member) => ["Screenplay", "Writer", "Story"].includes(member.job))
-            .map((member) => member.name)
-    ))
+    const directorsDetailed = buildDirectors(crew)
+    const directors = directorsDetailed.map((member) => member.name)
+    const writersDetailed = []
+    const seenWriters = new Set()
+
+    crew.forEach((member) => {
+        if (
+            !member.id
+            || seenWriters.has(member.id)
+            || !["Screenplay", "Writer", "Story"].includes(member.job)
+        ) {
+            return
+        }
+
+        seenWriters.add(member.id)
+        writersDetailed.push(normalizeCrewMember(member))
+    })
+
+    const writers = writersDetailed.map((member) => member.name)
+    const directorIds = new Set(directorsDetailed.map((member) => member.id))
+    const keyCrew = buildKeyCrew(crew, directorIds)
 
     const videos = (payload.videos?.results || [])
         .filter((video) => video.site === "YouTube")
@@ -429,7 +863,11 @@ const getMovieDetails = async (movieId) => {
         cast,
         crew: {
             directors,
-            writers
+            directorsDetailed,
+            director: directorsDetailed[0] || null,
+            writers,
+            writersDetailed,
+            keyCrew
         },
         trailer,
         videos,
@@ -451,13 +889,215 @@ const getMovieSummary = async (movieId) => {
     return normalizeMovie(payload, genreMap)
 }
 
+const GENDER_LABELS = {
+    0: null,
+    1: "Female",
+    2: "Male",
+    3: "Non-binary"
+}
+
+const safeHttpUrl = (value) => {
+    if (!value) return null
+
+    try {
+        const url = new URL(String(value))
+
+        return ["http:", "https:"].includes(url.protocol)
+            ? url.toString()
+            : null
+    } catch {
+        return null
+    }
+}
+
+const normalizeExternalIds = (raw = {}) => {
+    const imdbId = raw.imdb_id || null
+    const wikidataId = raw.wikidata_id || null
+    const facebookId = raw.facebook_id || null
+    const instagramId = raw.instagram_id || null
+    const twitterId = raw.twitter_id || null
+    const tiktokId = raw.tiktok_id || null
+    const youtubeId = raw.youtube_id || null
+
+    const links = {}
+
+    if (imdbId) {
+        links.imdb = `https://www.imdb.com/name/${encodeURIComponent(imdbId)}`
+    }
+
+    if (wikidataId) {
+        links.wikidata = `https://www.wikidata.org/wiki/${encodeURIComponent(wikidataId)}`
+    }
+
+    if (facebookId) {
+        links.facebook = `https://www.facebook.com/${encodeURIComponent(facebookId)}`
+    }
+
+    if (instagramId) {
+        links.instagram = `https://www.instagram.com/${encodeURIComponent(instagramId)}`
+    }
+
+    if (twitterId) {
+        links.twitter = `https://twitter.com/${encodeURIComponent(twitterId)}`
+    }
+
+    if (tiktokId) {
+        links.tiktok = `https://www.tiktok.com/@${encodeURIComponent(tiktokId)}`
+    }
+
+    if (youtubeId) {
+        links.youtube = `https://www.youtube.com/channel/${encodeURIComponent(youtubeId)}`
+    }
+
+    return {
+        imdbId,
+        wikidataId,
+        facebookId,
+        instagramId,
+        twitterId,
+        tiktokId,
+        youtubeId,
+        links
+    }
+}
+
+const personExternalIdCache = new Map()
+
+const setPersonExternalIds = (personId, externalIds) => {
+    if (personExternalIdCache.size >= MAX_CACHE_ENTRIES) {
+        const oldestKey = personExternalIdCache.keys().next().value
+        if (oldestKey) personExternalIdCache.delete(oldestKey)
+    }
+
+    personExternalIdCache.set(Number(personId), {
+        externalIds,
+        expiresAt: Date.now() + DETAIL_TTL_MS
+    })
+}
+
+const getPersonExternalIdsFromCache = (personId) => {
+    const entry = personExternalIdCache.get(Number(personId))
+
+    if (!entry) return null
+
+    if (entry.expiresAt <= Date.now()) {
+        personExternalIdCache.delete(Number(personId))
+        return null
+    }
+
+    return entry.externalIds
+}
+
+const getPersonDetails = async (personId) => {
+    let payload
+
+    try {
+        payload = await requestTmdb(
+            `/person/${personId}`,
+            {
+                append_to_response: "movie_credits,external_ids"
+            },
+            DETAIL_TTL_MS
+        )
+    } catch (error) {
+        if (error?.statusCode === 404) {
+            throw new ApiError(404, "Person not found")
+        }
+
+        throw error
+    }
+
+    const externalIds = normalizeExternalIds(payload.external_ids || {})
+    const filmography = buildFilmography(payload.movie_credits || {})
+    const profile = getImage(payload.profile_path, "h632")
+
+    setPersonExternalIds(personId, externalIds)
+
+    return {
+        id: payload.id,
+        name: payload.name || "Unknown person",
+        biography: payload.biography?.trim() || "",
+        profile,
+        profileUrl: profile?.url || null,
+        birthday: payload.birthday || null,
+        deathday: payload.deathday || null,
+        placeOfBirth: payload.place_of_birth || null,
+        gender: payload.gender ?? 0,
+        genderLabel: GENDER_LABELS[payload.gender] || null,
+        knownForDepartment: payload.known_for_department || null,
+        alsoKnownAs: (payload.also_known_as || [])
+            .filter(Boolean)
+            .slice(0, 12),
+        homepage: safeHttpUrl(payload.homepage),
+        popularity: payload.popularity ?? null,
+        adult: Boolean(payload.adult),
+        externalIds,
+        knownFor: filmography.knownFor,
+        filmography: {
+            acting: filmography.acting,
+            directing: filmography.directing,
+            writing: filmography.writing,
+            production: filmography.production,
+            counts: filmography.counts
+        }
+    }
+}
+
+const unavailableAwards = (reason) => ({
+    available: false,
+    source: "Wikidata",
+    sourceUrl: null,
+    items: [],
+    awards: [],
+    nominations: [],
+    counts: {
+        awards: 0,
+        nominations: 0
+    },
+    reason
+})
+
+const getPersonAwards = async (personId) => {
+    let externalIds = getPersonExternalIdsFromCache(personId)
+
+    if (!externalIds) {
+        try {
+            const payload = await requestTmdb(
+                `/person/${personId}/external_ids`,
+                {},
+                DETAIL_TTL_MS
+            )
+
+            externalIds = normalizeExternalIds(payload)
+            setPersonExternalIds(personId, externalIds)
+        } catch (error) {
+            if (error?.statusCode === 404) {
+                throw new ApiError(404, "Person not found")
+            }
+
+            throw error
+        }
+    }
+
+    if (!externalIds.wikidataId) {
+        return unavailableAwards(
+            "This person has no linked Wikidata profile, so verified awards data is unavailable."
+        )
+    }
+
+    return getAwardsForWikidataId(externalIds.wikidataId)
+}
+
 export {
     MOVIE_CATEGORIES,
     getGenres,
     resolveGenreId,
     getMoviesByCategory,
     searchMovies,
+    searchMulti,
     discoverMoviesByGenre,
     getMovieDetails,
-    getMovieSummary
+    getMovieSummary,
+    getPersonDetails,
+    getPersonAwards
 }

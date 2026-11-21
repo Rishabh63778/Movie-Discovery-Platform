@@ -276,6 +276,210 @@
     line-height: 1.4;
 }
 
+.Cast-Card--Clickable {
+    cursor: pointer;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.Cast-Card--Clickable:hover,
+.Cast-Card--Clickable:focus-visible {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.42);
+}
+
+.Cast-Card--Clickable:focus-visible {
+    outline: 2px solid #ff3c3c;
+    outline-offset: 2px;
+}
+
+.Cast-Card--Clickable:hover h3 {
+    color: #ffb3b3;
+}
+
+.Director-List {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 16px;
+}
+
+.Director-Card {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+
+    padding: 14px 16px;
+
+    background: #1b1b1b;
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 14px;
+}
+
+.Director-Card--Clickable {
+    cursor: pointer;
+    transition:
+        background 0.25s ease,
+        border-color 0.25s ease,
+        transform 0.25s ease;
+}
+
+.Director-Card--Clickable:hover,
+.Director-Card--Clickable:focus-visible {
+    background: #212121;
+    border-color: rgba(255, 60, 60, 0.4);
+    transform: translateY(-2px);
+}
+
+.Director-Card--Clickable:focus-visible {
+    outline: 2px solid #ff3c3c;
+    outline-offset: 2px;
+}
+
+.Director-Photo {
+    flex: 0 0 82px;
+    width: 82px;
+    height: 82px;
+}
+
+.Director-Photo img,
+.Director-Fallback {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+
+    border-radius: 12px;
+}
+
+.Director-Fallback {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: linear-gradient(135deg, #2d2d2d, #181818);
+    color: #dddddd;
+    font-size: 22px;
+    font-weight: 700;
+}
+
+.Director-Info {
+    min-width: 0;
+}
+
+.Director-Info h3 {
+    font-size: 17px;
+    line-height: 1.3;
+    overflow-wrap: anywhere;
+}
+
+.Crew-Role {
+    display: block;
+    margin-bottom: 4px;
+
+    color: #ff8b8b;
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0.9px;
+    text-transform: uppercase;
+}
+
+.Crew-Arrow {
+    margin-left: auto;
+
+    color: #777777;
+    font-size: 20px;
+    transition: color 0.25s ease, transform 0.25s ease;
+}
+
+.Director-Card--Clickable:hover .Crew-Arrow {
+    color: #ff8b8b;
+    transform: translateX(3px);
+}
+
+.Key-Crew-List {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 12px;
+}
+
+.Key-Crew-Card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    padding: 11px 13px;
+
+    background: #1b1b1b;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 12px;
+}
+
+.Key-Crew-Card--Clickable {
+    cursor: pointer;
+    transition:
+        background 0.25s ease,
+        border-color 0.25s ease;
+}
+
+.Key-Crew-Card--Clickable:hover,
+.Key-Crew-Card--Clickable:focus-visible {
+    background: #212121;
+    border-color: rgba(255, 60, 60, 0.35);
+}
+
+.Key-Crew-Card--Clickable:focus-visible {
+    outline: 2px solid #ff3c3c;
+    outline-offset: 2px;
+}
+
+.Key-Crew-Photo {
+    flex: 0 0 44px;
+    width: 44px;
+    height: 44px;
+}
+
+.Key-Crew-Photo img,
+.Key-Crew-Fallback {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+
+    border-radius: 10px;
+}
+
+.Key-Crew-Fallback {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: linear-gradient(135deg, #2d2d2d, #181818);
+    color: #dddddd;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.Key-Crew-Info {
+    min-width: 0;
+}
+
+.Key-Crew-Info h3 {
+    font-size: 14px;
+    line-height: 1.3;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.Key-Crew-Info .Crew-Role {
+    margin-bottom: 2px;
+    font-size: 9.5px;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 @media (max-width: 900px) {
     .MovieDisplay-Hero {
         padding: 25px 15px;
@@ -327,5 +531,16 @@
 
     .Cast-List {
         grid-auto-columns: 130px;
+    }
+
+    .Director-List,
+    .Key-Crew-List {
+        grid-template-columns: 1fr;
+    }
+
+    .Director-Photo {
+        flex-basis: 68px;
+        width: 68px;
+        height: 68px;
     }
 }

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react"
 import { Link } from "react-router-dom"
 import api from "../api/axios.js"
 import MovieCard from "../components/MovieCard.jsx"
+import Navbar from "../components/Navbar.jsx"
 import "../styles/Favourites.css"
 
 function Favourites() {
@@ -62,66 +63,70 @@ function Favourites() {
     }
 
     return (
-        <div className="Favourites">
+        <>
+            <Navbar />
 
-            <header className="Favourites-Header">
-                <Link to="/home" className="Back-Link">← Back to Home</Link>
-                <h1>My Favourites</h1>
-                <p>Movies you have saved to your account.</p>
-            </header>
+            <div className="Favourites">
 
-            {
-                loading ? (
-                    <p className="Loading">Loading favourites...</p>
-                ) : unauthorized ? (
-                    <div className="Favourites-Empty">
-                        <h2>Please log in</h2>
-                        <p>You need an account to view and save favourite movies.</p>
-                        <Link to="/login">Go to Login</Link>
-                    </div>
-                ) : favourites.length === 0 ? (
-                    error ? (
-                        <p className="Error">{error}</p>
-                    ) : (
+                <header className="Favourites-Header">
+                    <Link to="/home" className="Back-Link">← Back to Home</Link>
+                    <h1>My Favourites</h1>
+                    <p>Movies you have saved to your account.</p>
+                </header>
+
+                {
+                    loading ? (
+                        <p className="Loading">Loading favourites...</p>
+                    ) : unauthorized ? (
                         <div className="Favourites-Empty">
-                            <h2>No favourites yet</h2>
-                            <p>Open a movie and choose “Add to Favourites” to build your list.</p>
-                            <Link to="/home">Browse Movies</Link>
+                            <h2>Please log in</h2>
+                            <p>You need an account to view and save favourite movies.</p>
+                            <Link to="/login">Go to Login</Link>
                         </div>
-                    )
-                ) : (
-                    <>
-                        {
-                            error && <p className="Error">{error}</p>
-                        }
-
-                        <div className="Movie-Grid">
+                    ) : favourites.length === 0 ? (
+                        error ? (
+                            <p className="Error">{error}</p>
+                        ) : (
+                            <div className="Favourites-Empty">
+                                <h2>No favourites yet</h2>
+                                <p>Open a movie and choose “Add to Favourites” to build your list.</p>
+                                <Link to="/home">Browse Movies</Link>
+                            </div>
+                        )
+                    ) : (
+                        <>
                             {
-                                favourites.map((movie) => (
-                                    <div className="Favourite-Item" key={movie.id}>
-                                        <MovieCard movie={movie} />
-
-                                        <button
-                                            type="button"
-                                            className="Remove-Favourite"
-                                            onClick={() => removefavourite(movie.id)}
-                                            disabled={removingId === movie.id}
-                                        >
-                                            {
-                                                removingId === movie.id
-                                                    ? "Removing..."
-                                                    : "Remove"
-                                            }
-                                        </button>
-                                    </div>
-                                ))
+                                error && <p className="Error">{error}</p>
                             }
-                        </div>
-                    </>
-                )
-            }
 
-        </div>
+                            <div className="Movie-Grid">
+                                {
+                                    favourites.map((movie) => (
+                                        <div className="Favourite-Item" key={movie.id}>
+                                            <MovieCard movie={movie} />
+
+                                            <button
+                                                type="button"
+                                                className="Remove-Favourite"
+                                                onClick={() => removefavourite(movie.id)}
+                                                disabled={removingId === movie.id}
+                                            >
+                                                {
+                                                    removingId === movie.id
+                                                        ? "Removing..."
+                                                        : "Remove"
+                                                }
+                                            </button>
+                                        </div>
+                                    ))
+                                }
+                            </div>
+                        </>
+                    )
+                }
+
+            </div>
+        </>
     )
 }
 

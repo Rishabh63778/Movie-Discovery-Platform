@@ -1,0 +1,91 @@
+.Filmography-Card {
+    background: #1a1a1a;
+    border-radius: 13px;
+    overflow: hidden;
+
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.Filmography-Card:hover,
+.Filmography-Card:focus-visible {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 26px rgba(0, 0, 0, 0.45);
+}
+
+.Filmography-Card:focus-visible {
+    outline: 2px solid #ff3c3c;
+    outline-offset: 2px;
+}
+
+.Filmography-Poster {
+    width: 100%;
+    aspect-ratio: 2 / 3;
+    object-fit: cover;
+    display: block;
+}
+
+.Filmography-Fallback {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 16px;
+    text-align: center;
+
+    background: linear-gradient(135deg, #292929, #171717);
+    color: #dddddd;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.Filmography-Info {
+    padding: 12px 13px 14px;
+}
+
+.Filmography-Info h3 {
+    font-size: 15px;
+    line-height: 1.35;
+    margin-bottom: 7px;
+
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.Filmography-Meta {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+
+    color: #bdbdbd;
+    font-size: 12.5px;
+}
+
+.Filmography-Meta .Dot {
+    color: #777777;
+}
+
+.Filmography-Role {
+    margin-top: 8px;
+
+    color: #ffb3b3;
+    font-size: 12px;
+    line-height: 1.4;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+@media (max-width: 600px) {
+    .Filmography-Info {
+        padding: 10px;
+    }
+
+    .Filmography-Info h3 {
+        font-size: 14px;
+    }
+}

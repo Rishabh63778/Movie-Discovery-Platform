@@ -2,6 +2,7 @@ import asynchandler from "../utils/asynchandler.js"
 import apiresponse from "../utils/apiresponse.js"
 import ApiError from "../utils/apierror.js"
 import parseMovieId from "../utils/movieId.js"
+import parsePage from "../utils/page.js"
 import {
     getGenres,
     resolveGenreId,
@@ -10,16 +11,6 @@ import {
     discoverMoviesByGenre,
     getMovieDetails
 } from "../services/tmdb.service.js"
-
-const MAX_PAGE = 500
-
-const parsePage = (value) => {
-    const page = Number.parseInt(value, 10)
-
-    if (!Number.isFinite(page) || page < 1) return 1
-
-    return Math.min(page, MAX_PAGE)
-}
 
 const getallmovies = asynchandler(async (req, res) => {
     const page = parsePage(req.query.page)
